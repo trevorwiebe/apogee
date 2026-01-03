@@ -1,6 +1,7 @@
 package com.trevorwiebe.apogee.schedule.presentation.components
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
@@ -25,13 +26,14 @@ fun ScheduleListItem(
             ),
         shape = MaterialTheme.shapes.small
     ) {
-        Column(
+        Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(4.dp)
+                .padding(4.dp),
+            horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = timeSlot.startTime.toString())
-            Text(text = timeSlot.endTime.toString())
+            Text(text = timeSlot.endTime.plusNanos(1).toString())
         }
     }
 
