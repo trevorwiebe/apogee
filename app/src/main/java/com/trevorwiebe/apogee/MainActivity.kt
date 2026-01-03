@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.trevorwiebe.apogee.logtime.presentation.LogTimeScreen
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleScreen
 import com.trevorwiebe.apogee.ui.theme.ApogeeTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -26,7 +27,11 @@ class MainActivity : ComponentActivity() {
                     startDestination = "logtime"
                 ) {
 
-                    composable("logtime"){}
+                    composable("logtime"){
+                        LogTimeScreen(
+                            onNavigate = navController::navigate
+                        )
+                    }
 
                     composable("schedule"){
                         ScheduleScreen()
