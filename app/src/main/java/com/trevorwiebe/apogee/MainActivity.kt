@@ -23,14 +23,14 @@ class MainActivity : ComponentActivity() {
             ApogeeTheme {
                 NavHost(
                     navController = navController,
-                    startDestination = "schedule"
+                    startDestination = "logtime"
                 ) {
+
+                    composable("logtime"){}
 
                     composable("schedule"){
                         ScheduleScreen()
                     }
-
-                    composable("logtime"){}
                 }
             }
         }
