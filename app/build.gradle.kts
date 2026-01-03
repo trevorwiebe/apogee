@@ -1,3 +1,5 @@
+import com.android.build.api.dsl.ApplicationExtension
+
 plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
@@ -7,7 +9,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
 }
 
-android {
+configure<ApplicationExtension> {
     namespace = "com.trevorwiebe.apogee"
     compileSdk = 36
 
@@ -34,11 +36,18 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlinOptions {
-        jvmTarget = "17"
-    }
     buildFeatures {
         compose = true
+    }
+}
+
+kotlin{
+    compilerOptions {
+        jvmTarget.set(org.jetbrains.kotlin.gradle.dsl.JvmTarget.JVM_17)
+        freeCompilerArgs.addAll(listOf(
+            "-Xopt-in=kotlin.RequiresOptIn",
+            "-XexplicitApi=strict"
+        ))
     }
 }
 
