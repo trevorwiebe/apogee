@@ -12,12 +12,8 @@ class CreateWeekFifteenIncrements(
 
         // Loop through each week
         for (week in 0 until numberOfWeeks) {
-            // Loop through each day of the week (1-7, where 1 = Monday, 7 = Sunday)
-            for (dayOfWeek in 1..7) {
-                // Calculate the actual day number across all weeks
+            for (dayOfWeek in 0..6) {
                 val absoluteDayOfWeek = (week * 7) + dayOfWeek
-
-                // Create 96 fifteen-minute slots for each day (24 hours * 4 slots per hour)
                 for (slotIndex in 0 until 96) {
                     val startMinutes = slotIndex * 15
                     val startTime = LocalTime.of(startMinutes / 60, startMinutes % 60)

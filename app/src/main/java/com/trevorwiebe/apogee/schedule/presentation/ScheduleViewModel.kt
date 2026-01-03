@@ -15,6 +15,7 @@ class ScheduleViewModel @Inject constructor(
 ): ViewModel() {
 
     var timeSlots by mutableStateOf(emptyList<FifteenMinSlot>())
+    val dayList = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
     init{
         timeSlots = createWeekFifteenIncrements()
