@@ -27,7 +27,7 @@ fun ScheduleScreen(
     val dayList = viewModel.dayList
     val systemBar = WindowInsets.navigationBars.asPaddingValues()
 
-    val groupedByDay = timeSlots.groupBy { it.dayOfTheWeek }
+    val groupedByDay = timeSlots.groupBy { it.slot.dayOfTheWeek }
 
     LazyColumn(
         modifier = Modifier
@@ -49,7 +49,15 @@ fun ScheduleScreen(
             }
 
             items(slotsForDay) { slot ->
-                ScheduleListItem(slot)
+                ScheduleListItem(
+                    timeSlot = slot,
+                    onClick = {
+                        viewModel.onTimeSlotClicked(it)
+                    },
+                    onLongClick = {
+                        viewModel.onTimeSlotLongClicked(it)
+                    }
+                )
             }
         }
     }
