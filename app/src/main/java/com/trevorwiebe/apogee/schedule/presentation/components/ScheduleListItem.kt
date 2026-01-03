@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Card
+import androidx.compose.ui.draw.clip
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -25,13 +26,14 @@ fun ScheduleListItem(
     Card(
         modifier = Modifier
             .fillMaxWidth()
-            .combinedClickable(
-                onClick = { onClick(timeSlot) },
-                onLongClick = { onLongClick(timeSlot) }
-            )
             .padding(
                 horizontal = 4.dp,
                 vertical = 2.dp
+            )
+            .clip(MaterialTheme.shapes.small)
+            .combinedClickable(
+                onClick = { onClick(timeSlot) },
+                onLongClick = { onLongClick(timeSlot) },
             ),
         colors = CardDefaults.cardColors(
             containerColor = if(timeSlot.selected){
