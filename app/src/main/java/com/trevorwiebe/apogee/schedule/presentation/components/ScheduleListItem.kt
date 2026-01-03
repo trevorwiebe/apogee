@@ -45,7 +45,7 @@ fun ScheduleListItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(8.dp),
+                .padding(horizontal = 8.dp, vertical = 16.dp),
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
             Text(text = timeSlot.slot.startTime.toString())

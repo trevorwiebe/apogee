@@ -39,11 +39,11 @@ fun ScheduleScreen(
             stickyHeader {
                 Text(
                     text = dayList[dayIndex],
-                    style = MaterialTheme.typography.titleLarge,
+                    style = MaterialTheme.typography.titleMedium,
                     modifier = Modifier
                         .fillMaxWidth()
                         .background(MaterialTheme.colorScheme.primaryContainer)
-                        .padding(16.dp),
+                        .padding(8.dp),
                     color = MaterialTheme.colorScheme.onPrimaryContainer
                 )
             }
