@@ -14,6 +14,7 @@ class ScheduleViewModel @Inject constructor(
 ): ViewModel() {
 
     var timeSlots by mutableStateOf(emptyList<UiTimeSlot>())
+    var anySelected by mutableStateOf(false)
     val dayList = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
     init{
@@ -26,12 +27,14 @@ class ScheduleViewModel @Inject constructor(
     }
 
     fun onTimeSlotClicked(timeSlot: UiTimeSlot) {
-        if(timeSlots.any { it.selected }){
+        if(anySelected){
             updateTimeSlotSelection(timeSlot)
         }
+        setAnySelected()
     }
     fun onTimeSlotLongClicked(timeSlot: UiTimeSlot) {
         updateTimeSlotSelection(timeSlot)
+        setAnySelected()
     }
 
     private fun updateTimeSlotSelection(timeSlot: UiTimeSlot){
@@ -42,5 +45,9 @@ class ScheduleViewModel @Inject constructor(
                 it
             }
         }
+    }
+
+    fun setAnySelected(){
+        anySelected = timeSlots.any { it.selected }
     }
 }
