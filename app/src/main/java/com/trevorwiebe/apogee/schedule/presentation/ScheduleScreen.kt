@@ -51,7 +51,13 @@ fun ScheduleScreen(
     BottomSheetScaffold(
         scaffoldState = scaffoldState,
         sheetContent = {
-            ScheduleBottomSheet()
+            ScheduleBottomSheet(
+                onSave = {
+                    scope.launch {
+                        scaffoldState.bottomSheetState.partialExpand()
+                    }
+                }
+            )
         },
         sheetPeekHeight = 0.dp
     ) { padding ->
