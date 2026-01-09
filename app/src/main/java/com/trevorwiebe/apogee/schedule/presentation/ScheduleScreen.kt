@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -33,7 +34,6 @@ fun ScheduleScreen(
 
     val timeSlots = viewModel.timeSlots
     val dayList = viewModel.dayList
-    val systemBar = WindowInsets.navigationBars.asPaddingValues()
     val scaffoldState = rememberBottomSheetScaffoldState()
     val scope = rememberCoroutineScope()
 
@@ -49,6 +49,9 @@ fun ScheduleScreen(
     }
 
     BottomSheetScaffold(
+        modifier = Modifier
+            .displayCutoutPadding()
+            .imePadding(),
         scaffoldState = scaffoldState,
         sheetContent = {
             ScheduleBottomSheet(
@@ -64,9 +67,8 @@ fun ScheduleScreen(
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
-                .padding(padding)
-                .displayCutoutPadding(),
-            contentPadding = systemBar
+                .padding(padding),
+            contentPadding = WindowInsets.navigationBars.asPaddingValues()
         ) {
             groupedByDay.forEach { (dayIndex, slotsForDay) ->
                 stickyHeader {
