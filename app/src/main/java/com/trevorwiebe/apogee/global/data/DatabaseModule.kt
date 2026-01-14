@@ -24,7 +24,7 @@ object DatabaseModule {
             AppDatabase::class.java,
             "apogee_database"
         )
-        .fallbackToDestructiveMigration()
+            .fallbackToDestructiveMigration(true)
         .build()
     }
 
