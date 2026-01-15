@@ -6,8 +6,8 @@ import java.time.LocalTime
 
 @Entity(tableName = "schedule_items")
 data class ScheduleItem(
-    @PrimaryKey
-    val id: String,
+    @PrimaryKey(autoGenerate = true)
+    val id: Int,
     val name: String,
     val startTime: LocalTime,
     val endTime: LocalTime,
