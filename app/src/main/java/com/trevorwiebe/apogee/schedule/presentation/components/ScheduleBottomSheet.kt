@@ -26,7 +26,8 @@ import com.trevorwiebe.apogee.global.presentation.ATextField
 @Composable
 fun ScheduleBottomSheet(
     modifier: Modifier = Modifier,
-    onSave: () -> Unit
+    saveButtonEnabled: Boolean,
+    onSave: (String) -> Unit
 ) {
 
     val taskTitle = remember { mutableStateOf("") }
@@ -52,11 +53,10 @@ fun ScheduleBottomSheet(
             )
 
             Button(
-                onClick = onSave,
+                onClick = { onSave(taskTitle.value) },
+                enabled = saveButtonEnabled
             ) {
-                Text(
-                    text = "Save"
-                )
+                Text(text = "Save")
             }
         }
 

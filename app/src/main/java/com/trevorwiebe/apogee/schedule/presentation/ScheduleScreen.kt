@@ -18,6 +18,7 @@ import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleBottomSheet
@@ -55,6 +56,11 @@ fun ScheduleScreen(
         }
     }
 
+    LaunchedEffect(pagerState) {
+        snapshotFlow {pagerState.currentPage }.collect { position ->
+            viewModel.weekDaySelected = position
+        }
+    }
 
     BoxWithConstraints {
 
@@ -67,7 +73,9 @@ fun ScheduleScreen(
             scaffoldState = scaffoldState,
             sheetContent = {
                 ScheduleBottomSheet(
-                    onSave = {
+                    saveButtonEnabled = viewModel.saveButtonEnabled,
+                    onSave = { title ->
+                        viewModel.onEvent(ScheduleEvents.OnSaveEvent(title))
                         scope.launch { scaffoldState.bottomSheetState.partialExpand() }
                     }
                 )
