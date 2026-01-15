@@ -33,6 +33,16 @@ class ScheduleViewModel @Inject constructor(
 
     fun onEvent(event: ScheduleEvents){
         when(event){
+            is ScheduleEvents.OnClick -> {
+                if(anySelected){
+                    updateTimeSlotSelection(event.timeSlot)
+                }
+                setAnySelected()
+            }
+            is ScheduleEvents.OnLongClick -> {
+                updateTimeSlotSelection(event.timeSlot)
+                setAnySelected()
+            }
             is ScheduleEvents.OnSaveEvent -> {
                 try{
                     val title = event.title
@@ -49,17 +59,6 @@ class ScheduleViewModel @Inject constructor(
                 }catch (e: Exception){ }
             }
         }
-    }
-
-    fun onTimeSlotClicked(timeSlot: UiTimeSlot) {
-        if(anySelected){
-            updateTimeSlotSelection(timeSlot)
-        }
-        setAnySelected()
-    }
-    fun onTimeSlotLongClicked(timeSlot: UiTimeSlot) {
-        updateTimeSlotSelection(timeSlot)
-        setAnySelected()
     }
 
     private fun updateTimeSlotSelection(timeSlot: UiTimeSlot){
@@ -79,7 +78,7 @@ class ScheduleViewModel @Inject constructor(
         }
     }
 
-    fun setAnySelected(){
+    private fun setAnySelected(){
         anySelected = timeSlots.any { it.selected }
     }
 

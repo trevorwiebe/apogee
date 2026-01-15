@@ -105,8 +105,12 @@ fun ScheduleScreen(
                     ScheduleDayList(
                         list = groupedByDay[position] ?: emptyList(),
                         bottomSheetHeight = bottomSheetHeight,
-                        onClick = { viewModel.onTimeSlotClicked(it) },
-                        onLongClick = { viewModel.onTimeSlotLongClicked(it) }
+                        onClick = {
+                            viewModel.onEvent(ScheduleEvents.OnClick(it))
+                        },
+                        onLongClick = {
+                            viewModel.onEvent(ScheduleEvents.OnLongClick(it))
+                        }
                     )
                 }
             }
