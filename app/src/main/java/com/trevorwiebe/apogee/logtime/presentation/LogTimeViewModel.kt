@@ -82,7 +82,20 @@ class LogTimeViewModel @Inject constructor(
         }
     }
 
-    fun loadEarlierDates() {
+    fun onEvent(event: LogTimeEvents) {
+        when (event) {
+            is LogTimeEvents.OnScrollPositionChanged -> {
+                if (event.firstVisibleIndex < LOAD_THRESHOLD_DAYS * 96) {
+                    loadEarlierDates()
+                }
+                if (slots.size - event.lastVisibleIndex < LOAD_THRESHOLD_DAYS * 96) {
+                    loadLaterDates()
+                }
+            }
+        }
+    }
+
+    private fun loadEarlierDates() {
         val newStartDate = loadedStartDate.minusDays(LOAD_THRESHOLD_DAYS.toLong())
         val newSlots = createDateTimeSlots.forRange(newStartDate, loadedStartDate.minusDays(1))
             .map { LogTimeUiSlot(slot = it, scheduleShould = null) }
@@ -91,22 +104,12 @@ class LogTimeViewModel @Inject constructor(
         slots = mapScheduleShouldToSlots(newSlots) + slots
     }
 
-    fun loadLaterDates() {
+    private fun loadLaterDates() {
         val newEndDate = loadedEndDate.plusDays(LOAD_THRESHOLD_DAYS.toLong())
         val newSlots = createDateTimeSlots.forRange(loadedEndDate.plusDays(1), newEndDate)
             .map { LogTimeUiSlot(slot = it, scheduleShould = null) }
 
         loadedEndDate = newEndDate
         slots = slots + mapScheduleShouldToSlots(newSlots)
-    }
-
-    fun onScrollPositionChanged(firstVisibleIndex: Int, lastVisibleIndex: Int) {
-        if (firstVisibleIndex < LOAD_THRESHOLD_DAYS * 96) {
-            loadEarlierDates()
-        }
-
-        if (slots.size - lastVisibleIndex < LOAD_THRESHOLD_DAYS * 96) {
-            loadLaterDates()
-        }
     }
 }

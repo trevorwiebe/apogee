@@ -211,7 +211,7 @@ class LogTimeViewModelTest {
         val initialSize = viewModel.slots.size
 
         // When
-        viewModel.loadEarlierDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(0, 10))
 
         // Then
         val expectedNewSlots = 7 * 96
@@ -225,7 +225,7 @@ class LogTimeViewModelTest {
         val firstSlotBefore = viewModel.slots.first()
 
         // When
-        viewModel.loadEarlierDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(0, 10))
 
         // Then
         val newFirstSlot = viewModel.slots.first()
@@ -248,7 +248,7 @@ class LogTimeViewModelTest {
         advanceUntilIdle()
 
         // When
-        viewModel.loadEarlierDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(0, 10))
 
         // Then
         val tuesdaySlots = viewModel.slots.filter { it.slot.zeroDayOfWeek == 1 }
@@ -270,7 +270,7 @@ class LogTimeViewModelTest {
         val initialSize = viewModel.slots.size
 
         // When
-        viewModel.loadLaterDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(viewModel.slots.size - 100, viewModel.slots.size - 1))
 
         // Then
         val expectedNewSlots = 7 * 96
@@ -284,7 +284,7 @@ class LogTimeViewModelTest {
         val lastSlotBefore = viewModel.slots.last()
 
         // When
-        viewModel.loadLaterDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(viewModel.slots.size - 100, viewModel.slots.size - 1))
 
         // Then
         val newLastSlot = viewModel.slots.last()
@@ -307,7 +307,7 @@ class LogTimeViewModelTest {
         advanceUntilIdle()
 
         // When
-        viewModel.loadLaterDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(viewModel.slots.size - 100, viewModel.slots.size - 1))
 
         // Then
         val saturdaySlots = viewModel.slots.filter { it.slot.zeroDayOfWeek == 5 }
@@ -331,7 +331,7 @@ class LogTimeViewModelTest {
 
         // When - scroll position is within threshold of start
         val thresholdIndex = (7 * 96) - 1 // Just within the 7-day threshold
-        viewModel.onScrollPositionChanged(thresholdIndex, thresholdIndex + 10)
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(thresholdIndex, thresholdIndex + 10))
 
         // Then
         assertTrue(viewModel.slots.size > initialSize)
@@ -345,7 +345,7 @@ class LogTimeViewModelTest {
 
         // When - scroll position is within threshold of end
         val nearEndIndex = initialSize - (7 * 96) + 1
-        viewModel.onScrollPositionChanged(nearEndIndex - 10, nearEndIndex)
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(nearEndIndex - 10, nearEndIndex))
 
         // Then
         assertTrue(viewModel.slots.size > initialSize)
@@ -359,7 +359,7 @@ class LogTimeViewModelTest {
 
         // When - scroll position is in the middle
         val middleIndex = initialSize / 2
-        viewModel.onScrollPositionChanged(middleIndex, middleIndex + 10)
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(middleIndex, middleIndex + 10))
 
         // Then
         assertEquals(initialSize, viewModel.slots.size)
@@ -372,13 +372,13 @@ class LogTimeViewModelTest {
         val initialSize = viewModel.slots.size
 
         // First, load earlier to make room at start
-        viewModel.loadEarlierDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(0, 10))
         val sizeAfterEarlier = viewModel.slots.size
 
         // When - position near start (this shouldn't trigger since we just loaded)
         // But position near end should trigger
         val nearEndIndex = sizeAfterEarlier - (7 * 96) + 1
-        viewModel.onScrollPositionChanged(100, nearEndIndex)
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(100, nearEndIndex))
 
         // Then - should have loaded more at the end
         assertTrue(viewModel.slots.size > sizeAfterEarlier)
@@ -408,7 +408,7 @@ class LogTimeViewModelTest {
         viewModel = createViewModel()
 
         // When
-        viewModel.loadEarlierDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(0, 10))
 
         // Then
         for (i in 0 until viewModel.slots.size - 1) {
@@ -425,7 +425,7 @@ class LogTimeViewModelTest {
         viewModel = createViewModel()
 
         // When
-        viewModel.loadLaterDates()
+        viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(viewModel.slots.size - 100, viewModel.slots.size - 1))
 
         // Then
         for (i in 0 until viewModel.slots.size - 1) {

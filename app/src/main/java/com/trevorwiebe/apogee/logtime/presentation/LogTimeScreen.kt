@@ -50,7 +50,7 @@ fun LogTimeScreen(
                 listState.layoutInfo.visibleItemsInfo.lastOrNull()?.index ?: 0
             )
         }.collect { (firstVisible, lastVisible) ->
-            viewModel.onScrollPositionChanged(firstVisible, lastVisible)
+            viewModel.onEvent(LogTimeEvents.OnScrollPositionChanged(firstVisible, lastVisible))
         }
     }
 
