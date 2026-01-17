@@ -68,7 +68,7 @@ class CreateWeekFifteenIncrementsTest {
         // Then
         assertEquals(LocalTime.of(0, 0, 0, 0), firstSlot.startTime)
         assertEquals(LocalTime.of(0, 14, 59, 999_999_999), firstSlot.endTime)
-        assertEquals(1, firstSlot.dayOfTheWeek)
+        assertEquals(0, firstSlot.dayOfTheWeek)
     }
 
     @Test
@@ -83,7 +83,7 @@ class CreateWeekFifteenIncrementsTest {
         // Then
         assertEquals(LocalTime.of(23, 45, 0, 0), lastSlotOfDay.startTime)
         assertEquals(LocalTime.of(23, 59, 59, 999_999_999), lastSlotOfDay.endTime)
-        assertEquals(1, lastSlotOfDay.dayOfTheWeek)
+        assertEquals(0, lastSlotOfDay.dayOfTheWeek)
     }
 
     @Test
@@ -168,17 +168,17 @@ class CreateWeekFifteenIncrementsTest {
         val result = useCase()
 
         // Then
-        // Week 1: days 1-7
-        assertEquals(1, result[0].dayOfTheWeek) // First slot of day 1
-        assertEquals(7, result[96 * 7 - 1].dayOfTheWeek) // Last slot of day 7
+        // Week 1: days 0-6
+        assertEquals(0, result[0].dayOfTheWeek) // First slot of day 0
+        assertEquals(6, result[96 * 7 - 1].dayOfTheWeek) // Last slot of day 6
 
-        // Week 2: days 8-14
-        assertEquals(8, result[96 * 7].dayOfTheWeek) // First slot of day 8
-        assertEquals(14, result[96 * 14 - 1].dayOfTheWeek) // Last slot of day 14
+        // Week 2: days 7-13
+        assertEquals(7, result[96 * 7].dayOfTheWeek) // First slot of day 7
+        assertEquals(13, result[96 * 14 - 1].dayOfTheWeek) // Last slot of day 13
 
-        // Week 3: days 15-21
-        assertEquals(15, result[96 * 14].dayOfTheWeek) // First slot of day 15
-        assertEquals(21, result[96 * 21 - 1].dayOfTheWeek) // Last slot of day 21
+        // Week 3: days 14-20
+        assertEquals(14, result[96 * 14].dayOfTheWeek) // First slot of day 14
+        assertEquals(20, result[96 * 21 - 1].dayOfTheWeek) // Last slot of day 20
     }
 
     @Test
@@ -230,19 +230,19 @@ class CreateWeekFifteenIncrementsTest {
 
         // Then - Check some specific slots
         // Slot at 9:00 AM (slot index 36: 9*4)
-        val slot9AM = result.find { it.startTime == LocalTime.of(9, 0) && it.dayOfTheWeek == 1 }
+        val slot9AM = result.find { it.startTime == LocalTime.of(9, 0) && it.dayOfTheWeek == 0 }
         assertNotNull(slot9AM)
         assertEquals(LocalTime.of(9, 0, 0, 0), slot9AM?.startTime)
         assertEquals(LocalTime.of(9, 14, 59, 999_999_999), slot9AM?.endTime)
 
         // Slot at 12:30 PM (slot index 50: 12*4 + 2)
-        val slot1230PM = result.find { it.startTime == LocalTime.of(12, 30) && it.dayOfTheWeek == 1 }
+        val slot1230PM = result.find { it.startTime == LocalTime.of(12, 30) && it.dayOfTheWeek == 0 }
         assertNotNull(slot1230PM)
         assertEquals(LocalTime.of(12, 30, 0, 0), slot1230PM?.startTime)
         assertEquals(LocalTime.of(12, 44, 59, 999_999_999), slot1230PM?.endTime)
 
         // Slot at 6:45 PM (slot index 75: 18*4 + 3)
-        val slot645PM = result.find { it.startTime == LocalTime.of(18, 45) && it.dayOfTheWeek == 1 }
+        val slot645PM = result.find { it.startTime == LocalTime.of(18, 45) && it.dayOfTheWeek == 0 }
         assertNotNull(slot645PM)
         assertEquals(LocalTime.of(18, 45, 0, 0), slot645PM?.startTime)
         assertEquals(LocalTime.of(18, 59, 59, 999_999_999), slot645PM?.endTime)
@@ -255,7 +255,7 @@ class CreateWeekFifteenIncrementsTest {
 
         // When
         val result = useCase()
-        val day1Slots = result.filter { it.dayOfTheWeek == 1 }
+        val day0Slots = result.filter { it.dayOfTheWeek == 0 }
 
         // Then - Check that we have slots starting at every 15-minute mark
         val expectedStartTimes = mutableListOf<LocalTime>()
@@ -265,7 +265,7 @@ class CreateWeekFifteenIncrementsTest {
             }
         }
 
-        val actualStartTimes = day1Slots.map { it.startTime }
+        val actualStartTimes = day0Slots.map { it.startTime }
         assertEquals(expectedStartTimes, actualStartTimes)
     }
 
@@ -278,14 +278,14 @@ class CreateWeekFifteenIncrementsTest {
         val result = useCase()
 
         // Then
-        // Last slot of day 1
-        val lastSlotDay1 = result.filter { it.dayOfTheWeek == 1 }.last()
-        assertEquals(LocalTime.of(23, 45), lastSlotDay1.startTime)
-        assertEquals(LocalTime.of(23, 59, 59, 999_999_999), lastSlotDay1.endTime)
+        // Last slot of day 0
+        val lastSlotDay0 = result.filter { it.dayOfTheWeek == 0 }.last()
+        assertEquals(LocalTime.of(23, 45), lastSlotDay0.startTime)
+        assertEquals(LocalTime.of(23, 59, 59, 999_999_999), lastSlotDay0.endTime)
 
-        // First slot of day 2
-        val firstSlotDay2 = result.filter { it.dayOfTheWeek == 2 }.first()
-        assertEquals(LocalTime.of(0, 0), firstSlotDay2.startTime)
-        assertEquals(LocalTime.of(0, 14, 59, 999_999_999), firstSlotDay2.endTime)
+        // First slot of day 1
+        val firstSlotDay1 = result.filter { it.dayOfTheWeek == 1 }.first()
+        assertEquals(LocalTime.of(0, 0), firstSlotDay1.startTime)
+        assertEquals(LocalTime.of(0, 14, 59, 999_999_999), firstSlotDay1.endTime)
     }
 }
