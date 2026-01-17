@@ -8,7 +8,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
 import com.trevorwiebe.apogee.schedule.data.ScheduleItem
-import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleItemUseCase
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleItem
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
 import java.time.LocalTime
@@ -17,7 +17,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val createWeekFifteenIncrements: CreateWeekFifteenIncrements,
-    private val saveScheduleItemUseCase: SaveScheduleItemUseCase
+    private val saveScheduleItem: SaveScheduleItem
 ): ViewModel() {
 
     var timeSlots by mutableStateOf(emptyList<UiTimeSlot>())
@@ -61,7 +61,7 @@ class ScheduleViewModel @Inject constructor(
                     )
 
                     viewModelScope.launch {
-                        saveScheduleItemUseCase(scheduleItem)
+                        saveScheduleItem(scheduleItem)
                         timeSlots = timeSlots.map { it.copy(selected = false) }
                         anySelected = false
                     }
