@@ -53,7 +53,12 @@ fun ScheduleListItem(
             Row(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(start = 8.dp, end = 8.dp, top = 16.dp),
+                    .padding(
+                        start = 8.dp,
+                        end = 8.dp,
+                        top = if(timeSlot.task == null)
+                            16.dp else 4.dp
+                    ),
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 Text(text = timeSlot.slot.startTime.toString())
@@ -63,8 +68,8 @@ fun ScheduleListItem(
                 Spacer(modifier = Modifier.height(16.dp))
             }else{
                 Text(
-                    modifier = Modifier.padding(horizontal = 8.dp),
-                    text = timeSlot.task.name,
+                    modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 2.dp),
+                    text = "Task: ${timeSlot.task.name}",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
