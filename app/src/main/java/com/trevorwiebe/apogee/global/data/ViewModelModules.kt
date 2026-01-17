@@ -1,6 +1,7 @@
 package com.trevorwiebe.apogee.global.data
 
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
+import com.trevorwiebe.apogee.logtime.domain.usecases.CreateDateTimeSlots
 import com.trevorwiebe.apogee.schedule.data.ScheduleShouldDao
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
 import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
@@ -34,5 +35,11 @@ object ViewModelModules {
         scheduleShouldDao: ScheduleShouldDao
     ): GetScheduledShould{
         return GetScheduledShould(scheduleShouldDao = scheduleShouldDao)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun providesCreateDateTimeSlots(): CreateDateTimeSlots {
+        return CreateDateTimeSlots()
     }
 }
