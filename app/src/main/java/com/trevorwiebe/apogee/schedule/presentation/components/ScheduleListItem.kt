@@ -64,7 +64,7 @@ fun ScheduleListItem(
             }else{
                 Text(
                     modifier = Modifier.padding(horizontal = 8.dp),
-                    text = "Test",
+                    text = timeSlot.task.name,
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
