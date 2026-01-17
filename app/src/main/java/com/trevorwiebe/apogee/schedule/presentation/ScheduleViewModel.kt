@@ -30,7 +30,8 @@ class ScheduleViewModel @Inject constructor(
         timeSlots = createWeekFifteenIncrements().map {
             UiTimeSlot(
                 slot = it,
-                selected = false
+                selected = false,
+                task = null
             )
         }
     }
