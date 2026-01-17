@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "7c35c05e038708404210e14a6418c2a8",
+    "identityHash": "90445dcf2f0f02809dbf8085ff9fa4fe",
     "entities": [
       {
         "tableName": "schedule_should",
@@ -45,11 +45,35 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "schedule_did",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c35c05e038708404210e14a6418c2a8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '90445dcf2f0f02809dbf8085ff9fa4fe')"
     ]
   }
 }
