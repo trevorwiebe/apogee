@@ -1,12 +1,12 @@
 package com.trevorwiebe.apogee.schedule.presentation
 
-import com.trevorwiebe.apogee.schedule.data.ScheduleItem
+import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 
 object ScheduleVMUtils {
 
     internal fun mapTaskToTime(
         timeList: List<UiTimeSlot>,
-        taskList: List<ScheduleItem>
+        taskList: List<ScheduleShould>
     ): List<UiTimeSlot>{
         return timeList.map { time ->
             val task = taskList.find {

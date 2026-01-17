@@ -2,7 +2,7 @@ package com.trevorwiebe.apogee.global.data
 
 import android.content.Context
 import androidx.room.Room
-import com.trevorwiebe.apogee.schedule.data.ScheduleItemDao
+import com.trevorwiebe.apogee.schedule.data.ScheduleShouldDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,7 +30,7 @@ object DatabaseModule {
 
     @Provides
     @Singleton
-    fun provideScheduleItemDao(database: AppDatabase): ScheduleItemDao {
+    fun provideScheduleItemDao(database: AppDatabase): ScheduleShouldDao {
         return database.scheduleItemDao()
     }
 }

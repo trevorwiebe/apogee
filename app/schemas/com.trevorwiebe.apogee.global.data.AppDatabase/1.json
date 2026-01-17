@@ -2,10 +2,10 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "a423b24ec3e445901bfb82902e349e1d",
+    "identityHash": "7c35c05e038708404210e14a6418c2a8",
     "entities": [
       {
-        "tableName": "schedule_items",
+        "tableName": "schedule_should",
         "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `startTime` TEXT NOT NULL, `endTime` TEXT NOT NULL, `dayOfWeek` INTEGER NOT NULL)",
         "fields": [
           {
@@ -49,7 +49,7 @@
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'a423b24ec3e445901bfb82902e349e1d')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7c35c05e038708404210e14a6418c2a8')"
     ]
   }
 }

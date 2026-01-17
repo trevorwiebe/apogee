@@ -7,9 +7,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
-import com.trevorwiebe.apogee.schedule.data.ScheduleItem
-import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledItems
-import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleItem
+import com.trevorwiebe.apogee.schedule.data.ScheduleShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.mapTaskToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.launch
@@ -19,8 +19,8 @@ import javax.inject.Inject
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
     private val createWeekFifteenIncrements: CreateWeekFifteenIncrements,
-    private val saveScheduleItem: SaveScheduleItem,
-    private val getScheduledItems: GetScheduledItems
+    private val saveScheduleShould: SaveScheduleShould,
+    private val getScheduledShould: GetScheduledShould
 ): ViewModel() {
 
     var timeSlots by mutableStateOf(emptyList<UiTimeSlot>())
@@ -56,7 +56,7 @@ class ScheduleViewModel @Inject constructor(
                 try{
                     val title = event.title.ifEmpty { "Task" }
                     val times = calculateStartAndEnd(timeSlots)
-                    val scheduleItem = ScheduleItem(
+                    val scheduleShould = ScheduleShould(
                         id = 0,
                         name = title,
                         startTime = times.first,
@@ -65,7 +65,7 @@ class ScheduleViewModel @Inject constructor(
                     )
 
                     viewModelScope.launch {
-                        saveScheduleItem(scheduleItem)
+                        saveScheduleShould(scheduleShould)
                         timeSlots = timeSlots.map { it.copy(selected = false) }
                         anySelected = false
                     }
@@ -124,7 +124,7 @@ class ScheduleViewModel @Inject constructor(
 
     private fun initiateScheduledItems(){
         viewModelScope.launch {
-            getScheduledItems().collect { list ->
+            getScheduledShould().collect { list ->
                 timeSlots = mapTaskToTime(timeSlots, list)
             }
         }

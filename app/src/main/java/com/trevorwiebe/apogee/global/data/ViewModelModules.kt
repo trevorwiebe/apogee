@@ -1,9 +1,9 @@
 package com.trevorwiebe.apogee.global.data
 
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
-import com.trevorwiebe.apogee.schedule.data.ScheduleItemDao
-import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledItems
-import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleItem
+import com.trevorwiebe.apogee.schedule.data.ScheduleShouldDao
+import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -23,16 +23,16 @@ object ViewModelModules {
     @Provides
     @ViewModelScoped
     fun providesSaveScheduleItem(
-        scheduleItemDao: ScheduleItemDao
-    ): SaveScheduleItem {
-        return SaveScheduleItem(scheduleItemDao)
+        scheduleShouldDao: ScheduleShouldDao
+    ): SaveScheduleShould {
+        return SaveScheduleShould(scheduleShouldDao)
     }
 
     @Provides
     @ViewModelScoped
     fun provideGetScheduleItems(
-        scheduleItemDao: ScheduleItemDao
-    ): GetScheduledItems{
-        return GetScheduledItems(scheduleItemDao = scheduleItemDao)
+        scheduleShouldDao: ScheduleShouldDao
+    ): GetScheduledShould{
+        return GetScheduledShould(scheduleShouldDao = scheduleShouldDao)
     }
 }
