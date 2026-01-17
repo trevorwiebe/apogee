@@ -5,15 +5,19 @@ import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
 import com.trevorwiebe.apogee.schedule.data.ScheduleItem
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleItemUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.launch
 import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
 class ScheduleViewModel @Inject constructor(
-    private val createWeekFifteenIncrements: CreateWeekFifteenIncrements
+    private val createWeekFifteenIncrements: CreateWeekFifteenIncrements,
+    private val saveScheduleItemUseCase: SaveScheduleItemUseCase
 ): ViewModel() {
 
     var timeSlots by mutableStateOf(emptyList<UiTimeSlot>())
@@ -45,7 +49,7 @@ class ScheduleViewModel @Inject constructor(
             }
             is ScheduleEvents.OnSaveEvent -> {
                 try{
-                    val title = event.title
+                    val title = event.title.ifEmpty { "Task" }
                     val times = calculateStartAndEnd(timeSlots)
                     val scheduleItem = ScheduleItem(
                         id = 0,
@@ -55,6 +59,11 @@ class ScheduleViewModel @Inject constructor(
                         dayOfWeek = weekDaySelected,
                     )
 
+                    viewModelScope.launch {
+                        saveScheduleItemUseCase(scheduleItem)
+                        timeSlots = timeSlots.map { it.copy(selected = false) }
+                        anySelected = false
+                    }
 
                 }catch (e: Exception){ }
             }

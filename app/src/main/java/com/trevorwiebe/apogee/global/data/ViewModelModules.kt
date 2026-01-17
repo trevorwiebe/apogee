@@ -1,6 +1,8 @@
 package com.trevorwiebe.apogee.global.data
 
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
+import com.trevorwiebe.apogee.schedule.data.ScheduleItemDao
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleItemUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,4 +19,11 @@ object ViewModelModules {
         return CreateWeekFifteenIncrements()
     }
 
+    @Provides
+    @ViewModelScoped
+    fun providesSaveScheduleItemUseCase(
+        scheduleItemDao: ScheduleItemDao
+    ): SaveScheduleItemUseCase {
+        return SaveScheduleItemUseCase(scheduleItemDao)
+    }
 }
