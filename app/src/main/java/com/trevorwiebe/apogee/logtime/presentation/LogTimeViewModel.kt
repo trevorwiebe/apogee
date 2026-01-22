@@ -55,7 +55,7 @@ class LogTimeViewModel @Inject constructor(
 
         val daysFromStart = ChronoUnit.DAYS.between(loadedStartDate, today).toInt()
         val slotIndexInDay = createDateTimeSlots.slotIndexForTime(now)
-        val initialIndex = (daysFromStart * 96) + slotIndexInDay
+        val initialIndex = (daysFromStart * 97) + slotIndexInDay
 
         state = state.copy(
             initialScrollIndex = initialIndex.coerceIn(0, slots.size - 1)
