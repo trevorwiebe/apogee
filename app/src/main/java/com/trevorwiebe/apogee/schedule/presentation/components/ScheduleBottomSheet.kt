@@ -53,7 +53,10 @@ fun ScheduleBottomSheet(
             )
 
             Button(
-                onClick = { onSave(taskTitle.value) },
+                onClick = {
+                    onSave(taskTitle.value)
+                    taskTitle.value = ""
+                },
                 enabled = saveButtonEnabled
             ) {
                 Text(text = "Save")
