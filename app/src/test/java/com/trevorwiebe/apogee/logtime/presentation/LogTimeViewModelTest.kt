@@ -72,10 +72,8 @@ class LogTimeViewModelTest {
         viewModel = createViewModel()
 
         // Then
-        // Day 30 (today) starts at index 30 * 96 = 2880
-        // The actual index depends on current time, but should be in day 30's range
-        val day30StartIndex = 30 * 96
-        val day30EndIndex = 31 * 96 - 1
+        val day30StartIndex = 30 * 97 + 1
+        val day30EndIndex = 30 * 97 + 96
         assertTrue(
             "Initial scroll index should be in day 30's range",
             viewModel.state.initialScrollIndex in day30StartIndex..day30EndIndex
