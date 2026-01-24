@@ -9,6 +9,7 @@ import androidx.lifecycle.viewModelScope
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
 import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.schedule.data.ScheduleShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
 import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
@@ -25,13 +26,15 @@ class ScheduleViewModel @Inject constructor(
     private val createWeekFifteenIncrements: CreateWeekFifteenIncrements,
     private val saveScheduleShould: SaveScheduleShould,
     private val saveScheduleCould: SaveScheduleCould,
-    private val getScheduledShould: GetScheduledShould
+    private val getScheduledShould: GetScheduledShould,
+    private val getScheduleCould: GetScheduleCould
 ): ViewModel() {
 
     var timeSlots by mutableStateOf(emptyList<UiTimeSlot>())
     var anySelected by mutableStateOf(false)
     var weekDaySelected by mutableIntStateOf(0)
     var saveButtonEnabled by mutableStateOf(false)
+    var scheduleCoulds by mutableStateOf(emptyList<ScheduleCould>())
     val dayList = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
     private val _snackbarEvent = Channel<String>()
@@ -46,6 +49,7 @@ class ScheduleViewModel @Inject constructor(
             )
         }
         initiateScheduledItems()
+        initiateScheduleCoulds()
     }
 
     fun onEvent(event: ScheduleEvents){
@@ -148,6 +152,14 @@ class ScheduleViewModel @Inject constructor(
         viewModelScope.launch {
             getScheduledShould().collect { list ->
                 timeSlots = mapTaskToTime(timeSlots, list)
+            }
+        }
+    }
+
+    private fun initiateScheduleCoulds(){
+        viewModelScope.launch {
+            getScheduleCould().collect { list ->
+                scheduleCoulds = list
             }
         }
     }

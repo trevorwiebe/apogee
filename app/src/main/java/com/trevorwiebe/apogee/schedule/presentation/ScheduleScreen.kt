@@ -102,9 +102,9 @@ fun ScheduleScreen(
             },
             sheetContent = {
                 ScheduleBottomSheet(
-                    saveButtonEnabled = viewModel.saveButtonEnabled,
-                    onSave = { title ->
-                        viewModel.onEvent(ScheduleEvents.OnSaveEvent(title))
+                    scheduleCoulds = viewModel.scheduleCoulds,
+                    onItemClick = { scheduleCould ->
+                        viewModel.onEvent(ScheduleEvents.OnSaveEvent(scheduleCould.name))
                         scope.launch { scaffoldState.bottomSheetState.partialExpand() }
                     }
                 )

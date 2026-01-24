@@ -1,81 +1,102 @@
 package com.trevorwiebe.apogee.schedule.presentation.components
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.ime
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBars
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import com.trevorwiebe.apogee.global.presentation.ATextField
+import com.trevorwiebe.apogee.schedule.data.ScheduleCould
+import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.lightenColor
 
 @Composable
 fun ScheduleBottomSheet(
     modifier: Modifier = Modifier,
-    saveButtonEnabled: Boolean,
-    onSave: (String) -> Unit
+    scheduleCoulds: List<ScheduleCould>,
+    onItemClick: (ScheduleCould) -> Unit
 ) {
 
-    val taskTitle = remember { mutableStateOf("") }
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
-    val imePadding = WindowInsets.ime.asPaddingValues().calculateBottomPadding()
+
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .padding(horizontal = 16.dp)
+            .heightIn(max = 250.dp)
     ) {
 
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(bottom = 8.dp),
+                .padding(
+                    start = 8.dp,
+                    end = 8.dp,
+                    bottom = 8.dp
+                ),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ){
             Text(
-                modifier = Modifier.padding(8.dp),
-                text = "Add task",
+                text = "Set Activity",
                 fontWeight = FontWeight.Bold
             )
-
             Button(
-                onClick = {
-                    onSave(taskTitle.value)
-                    taskTitle.value = ""
-                },
-                enabled = saveButtonEnabled
+                onClick = {}
             ) {
-                Text(text = "Save")
+                Text(text = "Edit Activities")
             }
         }
 
-        ATextField(
-            modifier = Modifier
-                .padding(bottom = 8.dp)
-                .fillMaxWidth(),
-            value = taskTitle,
-            placeHolder = "Title"
-        )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            items(scheduleCoulds) { scheduleCould ->
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 8.dp, vertical = 2.dp)
+                        .clip(RoundedCornerShape(8.dp))
+                        .background(lightenColor(scheduleCould.color))
+                        .fillMaxWidth()
+                        .clickable { onItemClick(scheduleCould) }
+                        .padding(8.dp),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Box(
+                        modifier = Modifier
+                            .clip(CircleShape)
+                            .background(scheduleCould.color)
+                            .size(32.dp)
+                    )
+                    Spacer(Modifier.size(8.dp))
+                    Text(
+                        modifier = Modifier.weight(1f),
+                        text = scheduleCould.name,
+                        fontWeight = FontWeight.Medium
+                    )
+                }
+            }
+        }
     }
-
-    Spacer(Modifier.height(16.dp))
-
-    if(imePadding == 0.dp){
-        Spacer(Modifier.height(navBarPadding))
-    }
-
+    Spacer(Modifier.height(navBarPadding))
 }
