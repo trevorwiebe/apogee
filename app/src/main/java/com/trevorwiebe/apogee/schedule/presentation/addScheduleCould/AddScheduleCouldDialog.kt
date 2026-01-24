@@ -22,6 +22,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -35,7 +36,8 @@ import org.stanzamusic.stanza.presentation.saveCollection.coverCreator.colorPick
 
 @Composable
 fun AddScheduleCouldDialog(
-    sheetOpen: MutableState<Boolean>
+    sheetOpen: MutableState<Boolean>,
+    onSave: (title: String, description: String, color: Color) -> Unit
 ) {
 
     val primaryColor = MaterialTheme.colorScheme.primary
@@ -87,7 +89,13 @@ fun AddScheduleCouldDialog(
                         )
                         Spacer(Modifier.weight(1f))
                         Button(
-                            onClick = {},
+                            onClick = {
+                                onSave(
+                                    scheduleCouldTitle.value,
+                                    scheduleCouldDescription.value,
+                                    color.value
+                                )
+                            },
                             enabled = scheduleCouldTitle.value.isNotEmpty()
                         ) {
                             Text(

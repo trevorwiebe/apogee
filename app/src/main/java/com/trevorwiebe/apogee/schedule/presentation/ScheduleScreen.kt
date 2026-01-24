@@ -142,5 +142,9 @@ fun ScheduleScreen(
         }
     }
 
-    AddScheduleCouldDialog(sheetOpen = scheduleCouldDialogOpen)
+    AddScheduleCouldDialog(sheetOpen = scheduleCouldDialogOpen){
+        title, description, color ->
+        viewModel.onEvent(ScheduleEvents.OnSaveScheduleCould(title, description, color))
+        scheduleCouldDialogOpen.value = false
+    }
 }

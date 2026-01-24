@@ -7,8 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
+import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.mapTaskToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -20,6 +22,7 @@ import javax.inject.Inject
 class ScheduleViewModel @Inject constructor(
     private val createWeekFifteenIncrements: CreateWeekFifteenIncrements,
     private val saveScheduleShould: SaveScheduleShould,
+    private val saveScheduleCould: SaveScheduleCould,
     private val getScheduledShould: GetScheduledShould
 ): ViewModel() {
 
@@ -72,6 +75,7 @@ class ScheduleViewModel @Inject constructor(
 
                 }catch (e: Exception){ }
             }
+            is ScheduleEvents.OnSaveScheduleCould -> handleSaveScheduleCould(event)
         }
     }
 
@@ -94,6 +98,18 @@ class ScheduleViewModel @Inject constructor(
 
     private fun setAnySelected(){
         anySelected = timeSlots.any { it.selected }
+    }
+
+    private fun handleSaveScheduleCould(event: ScheduleEvents.OnSaveScheduleCould){
+        val scheduleCould = ScheduleCould(
+            id = 0,
+            name = event.title,
+            description = event.description,
+            color = event.color
+        )
+        viewModelScope.launch {
+            saveScheduleCould(scheduleCould)
+        }
     }
 
     private fun calculateStartAndEnd(list: List<UiTimeSlot>): Pair<LocalTime, LocalTime> {
