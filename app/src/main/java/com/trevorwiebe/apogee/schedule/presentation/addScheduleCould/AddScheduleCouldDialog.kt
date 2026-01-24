@@ -87,7 +87,8 @@ fun AddScheduleCouldDialog(
                         )
                         Spacer(Modifier.weight(1f))
                         Button(
-                            onClick = {}
+                            onClick = {},
+                            enabled = scheduleCouldTitle.value.isNotEmpty()
                         ) {
                             Text(
                                 text = "Save"
