@@ -1,7 +1,6 @@
 package com.trevorwiebe.apogee.schedule.presentation.addScheduleCould
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -11,6 +10,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
@@ -20,7 +21,8 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.Saver
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -45,10 +47,16 @@ fun AddScheduleCouldDialog(
 ) {
 
     val primaryColor = MaterialTheme.colorScheme.primary
+    val scrollState = rememberScrollState()
 
-    val scheduleCouldTitle = remember { mutableStateOf("") }
-    val scheduleCouldDescription = remember { mutableStateOf("") }
-    val color = remember { mutableStateOf(primaryColor) }
+    val colorSaver = Saver<MutableState<Color>, Long>(
+        save = { it.value.value.toLong() },
+        restore = { mutableStateOf(Color(it.toULong())) }
+    )
+
+    val scheduleCouldTitle = rememberSaveable { mutableStateOf("") }
+    val scheduleCouldDescription = rememberSaveable { mutableStateOf("") }
+    val color = rememberSaveable(saver = colorSaver) { mutableStateOf(primaryColor) }
 
     if (sheetOpen.value) {
         Dialog(
@@ -65,6 +73,7 @@ fun AddScheduleCouldDialog(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
             ) {
 
                 Column(
