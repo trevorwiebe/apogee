@@ -14,6 +14,8 @@ import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.mapTaskToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalTime
 import javax.inject.Inject
@@ -31,6 +33,9 @@ class ScheduleViewModel @Inject constructor(
     var weekDaySelected by mutableIntStateOf(0)
     var saveButtonEnabled by mutableStateOf(false)
     val dayList = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
+
+    private val _snackbarEvent = Channel<String>()
+    val snackbarEvent = _snackbarEvent.receiveAsFlow()
 
     init{
         timeSlots = createWeekFifteenIncrements().map {
@@ -109,6 +114,7 @@ class ScheduleViewModel @Inject constructor(
         )
         viewModelScope.launch {
             saveScheduleCould(scheduleCould)
+            _snackbarEvent.send("${event.title} saved")
         }
     }
 

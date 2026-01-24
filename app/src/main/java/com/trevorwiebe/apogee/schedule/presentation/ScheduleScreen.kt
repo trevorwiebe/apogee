@@ -2,8 +2,12 @@ package com.trevorwiebe.apogee.schedule.presentation
 
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.getValue
@@ -15,6 +19,8 @@ import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberBottomSheetScaffoldState
@@ -69,15 +75,30 @@ fun ScheduleScreen(
         }
     }
 
+    LaunchedEffect(viewModel) {
+        viewModel.snackbarEvent.collect { message ->
+            scaffoldState.snackbarHostState.showSnackbar(message)
+        }
+    }
+
     BoxWithConstraints {
 
         bottomSheetHeight = customSheetHeight(constraints.maxHeight, scaffoldState)
+        val systemBarsBottom = WindowInsets.systemBars.asPaddingValues().calculateBottomPadding()
 
         BottomSheetScaffold(
             modifier = Modifier
                 .fillMaxSize()
                 .imePadding(),
             scaffoldState = scaffoldState,
+            snackbarHost = {
+                SnackbarHost(
+                    hostState = scaffoldState.snackbarHostState,
+                    modifier = Modifier.padding(bottom = systemBarsBottom)
+                ) { snackbarData ->
+                    Snackbar(snackbarData = snackbarData)
+                }
+            },
             sheetContent = {
                 ScheduleBottomSheet(
                     saveButtonEnabled = viewModel.saveButtonEnabled,
@@ -111,6 +132,7 @@ fun ScheduleScreen(
 
             Column(
                 modifier = Modifier
+                    .padding(bottom = systemBarsBottom)
                     .fillMaxSize()
             ) {
                 Tabs(
