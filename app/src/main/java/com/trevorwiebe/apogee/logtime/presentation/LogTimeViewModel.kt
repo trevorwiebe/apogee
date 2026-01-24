@@ -9,6 +9,8 @@ import com.trevorwiebe.apogee.logtime.domain.usecases.CreateDateTimeSlots
 import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -32,6 +34,9 @@ class LogTimeViewModel @Inject constructor(
 
     var slots by mutableStateOf<List<LogTimeUiSlot>>(emptyList())
         private set
+
+    private val _scrollToNowEvent = Channel<Int>()
+    val scrollToNowEvent = _scrollToNowEvent.receiveAsFlow()
 
     private var scheduleShouldList: List<ScheduleShould> = emptyList()
 
@@ -90,6 +95,15 @@ class LogTimeViewModel @Inject constructor(
                 }
                 if (slots.size - event.lastVisibleIndex < LOAD_THRESHOLD_DAYS * 96) {
                     loadLaterDates()
+                }
+                val isNowVisible = state.initialScrollIndex in event.firstVisibleIndex..event.lastVisibleIndex
+                if (state.showScrollToNowButton != !isNowVisible) {
+                    state = state.copy(showScrollToNowButton = !isNowVisible)
+                }
+            }
+            is LogTimeEvents.OnScrollToNowClicked -> {
+                viewModelScope.launch {
+                    _scrollToNowEvent.send(state.initialScrollIndex)
                 }
             }
         }

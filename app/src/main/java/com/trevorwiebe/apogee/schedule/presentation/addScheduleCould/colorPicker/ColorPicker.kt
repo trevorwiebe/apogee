@@ -118,12 +118,14 @@ fun ColorPicker(
         Text(
             modifier = Modifier.padding(8.dp),
             text = "Choose a Color",
-            fontSize = 20.sp
+            fontSize = 20.sp,
+            color = MaterialTheme.colorScheme.onSurface
         )
 
         Text(
             modifier = Modifier.padding(horizontal = 8.dp),
             text = "Selected Color",
+            color = MaterialTheme.colorScheme.onSurface
         )
         Card(
             colors = CardDefaults.cardColors(

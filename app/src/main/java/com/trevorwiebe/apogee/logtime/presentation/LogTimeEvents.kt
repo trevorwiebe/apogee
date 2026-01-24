@@ -5,4 +5,5 @@ sealed class LogTimeEvents {
         val firstVisibleIndex: Int,
         val lastVisibleIndex: Int
     ) : LogTimeEvents()
+    data object OnScrollToNowClicked : LogTimeEvents()
 }

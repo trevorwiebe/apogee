@@ -90,7 +90,8 @@ fun AddScheduleCouldDialog(
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.close),
-                                contentDescription = null
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.onSurface
                             )
                         }
                         Spacer(Modifier.width(8.dp))
@@ -98,7 +99,8 @@ fun AddScheduleCouldDialog(
                             text = "Add Activity",
                             fontSize = 22.sp,
                             maxLines = 1,
-                            overflow = TextOverflow.Ellipsis
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colorScheme.onSurface
                         )
                         Spacer(Modifier.weight(1f))
                         Button(
