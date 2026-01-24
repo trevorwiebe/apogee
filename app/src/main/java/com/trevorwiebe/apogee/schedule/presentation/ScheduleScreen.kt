@@ -4,7 +4,6 @@ import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.systemBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.getValue
@@ -14,13 +13,20 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.unit.dp
 import androidx.compose.material3.BottomSheetScaffold
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberBottomSheetScaffoldState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.compose.ui.res.painterResource
+import androidx.hilt.navigation.compose.hiltViewModel
+import com.trevorwiebe.apogee.R
+import com.trevorwiebe.apogee.schedule.presentation.addScheduleCould.AddScheduleCouldDialog
 import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleBottomSheet
 import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleDayList
 import com.trevorwiebe.apogee.schedule.presentation.components.Tabs
@@ -46,6 +52,7 @@ fun ScheduleScreen(
     )
 
     var bottomSheetHeight by remember { mutableStateOf(0.dp) }
+    val scheduleCouldDialogOpen = remember { mutableStateOf(false) }
 
     LaunchedEffect(viewModel.anySelected) {
         scope.launch {
@@ -80,12 +87,30 @@ fun ScheduleScreen(
                     }
                 )
             },
-            sheetPeekHeight = 0.dp
+            sheetPeekHeight = 0.dp,
+            topBar = {
+                TopAppBar(
+                    title = {
+                        Text(text = "Schedule")
+                    },
+                    actions = {
+                        IconButton(
+                            onClick = {
+                                scheduleCouldDialogOpen.value = true
+                            }
+                        ) {
+                            Icon(
+                                painter = painterResource(R.drawable.calendar_add),
+                                contentDescription = null
+                            )
+                        }
+                    }
+                )
+            }
         ) { padding ->
 
             Column(
                 modifier = Modifier
-                    .systemBarsPadding()
                     .fillMaxSize()
             ) {
                 Tabs(
@@ -116,4 +141,6 @@ fun ScheduleScreen(
             }
         }
     }
+
+    AddScheduleCouldDialog(sheetOpen = scheduleCouldDialogOpen)
 }
