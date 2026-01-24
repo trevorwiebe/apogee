@@ -114,7 +114,7 @@ class ScheduleViewModel @Inject constructor(
         )
         viewModelScope.launch {
             saveScheduleCould(scheduleCould)
-            _snackbarEvent.send("${event.title} saved")
+            _snackbarEvent.send("Activity saved")
         }
     }
 

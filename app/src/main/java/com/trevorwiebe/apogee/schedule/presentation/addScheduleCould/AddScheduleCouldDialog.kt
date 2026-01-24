@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.Button
+import androidx.compose.material3.Card
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -29,6 +30,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
 import com.trevorwiebe.apogee.R
 import com.trevorwiebe.apogee.global.presentation.ATextField
 import com.trevorwiebe.apogee.ui.SystemBarColorForFullScreenDialog
@@ -82,7 +86,7 @@ fun AddScheduleCouldDialog(
                         }
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Add Schedule Item",
+                            text = "Add Activity",
                             fontSize = 22.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis
@@ -106,6 +110,40 @@ fun AddScheduleCouldDialog(
 
                     Spacer(Modifier.height(8.dp))
 
+                    Card(
+                        modifier = Modifier.padding(horizontal = 8.dp)
+                    ){
+                        Row(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(8.dp),
+                            verticalAlignment = Alignment.Top
+                        ){
+
+                            Icon(
+                                painter = painterResource(R.drawable.info),
+                                contentDescription = null,
+                                tint = MaterialTheme.colorScheme.primary
+                            )
+                            Spacer(Modifier.width(8.dp))
+                            Text(
+                                text = "Add activities that describe how you want to spend your time, for example; Sleeping, Exercising, Working, etc. \n \nOnce created, place them on your schedule to follow.",
+                                fontSize = 14.sp,
+                                style = TextStyle(
+                                    platformStyle = PlatformTextStyle(
+                                        includeFontPadding = false
+                                    ),
+                                    lineHeightStyle = LineHeightStyle(
+                                        alignment = LineHeightStyle.Alignment.Top,
+                                        trim = LineHeightStyle.Trim.Both
+                                    )
+                                )
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+
                     ATextField(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
@@ -114,7 +152,7 @@ fun AddScheduleCouldDialog(
                         placeHolder = "Title"
                     )
 
-                    Spacer(Modifier.height(8.dp))
+                    Spacer(Modifier.height(16.dp))
 
                     ATextField(
                         modifier = Modifier
