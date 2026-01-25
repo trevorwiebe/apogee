@@ -170,7 +170,7 @@ fun AddScheduleCouldDialog(
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth(),
                         value = scheduleCouldDescription,
-                        placeHolder = "Description"
+                        placeHolder = "Description (optional)"
                     )
 
                     Spacer(Modifier.height(8.dp))
