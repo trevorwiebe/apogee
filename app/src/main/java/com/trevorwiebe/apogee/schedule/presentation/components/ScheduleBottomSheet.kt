@@ -29,6 +29,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -63,26 +64,21 @@ fun ScheduleBottomSheet(
                     bottom = 8.dp
                 ),
             verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Row(
-                modifier = Modifier.padding(top = 16.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                IconButton(onClick = onClose) {
-                    Icon(
-                        painter = painterResource(R.drawable.close),
-                        contentDescription = "Close"
-                    )
-                }
-                Text(
-                    text = "Set Activity",
-                    fontSize = 22.sp,
-                    maxLines = 1,
-                    overflow = TextOverflow.Ellipsis,
-                    color = MaterialTheme.colorScheme.onSurface
+            IconButton(onClick = onClose) {
+                Icon(
+                    painter = painterResource(R.drawable.close),
+                    contentDescription = "Close"
                 )
             }
+            Text(
+                modifier = Modifier.weight(1f),
+                text = "Set Activity",
+                fontSize = 22.sp,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                color = MaterialTheme.colorScheme.onSurface
+            )
             Button(
                 onClick = {}
             ) {
