@@ -22,8 +22,10 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.TopAppBar
 import androidx.compose.material3.rememberBottomSheetScaffoldState
+import androidx.compose.material3.rememberStandardBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.rememberCoroutineScope
@@ -51,7 +53,18 @@ fun ScheduleScreen(
     val groupedByDay = timeSlots.groupBy { it.slot.dayOfTheWeek }
 
     val dayList = viewModel.dayList
-    val scaffoldState = rememberBottomSheetScaffoldState()
+    var allowDismiss by remember { mutableStateOf(false) }
+    val scaffoldState = rememberBottomSheetScaffoldState(
+        bottomSheetState = rememberStandardBottomSheetState(
+            initialValue = SheetValue.Hidden,
+            skipHiddenState = false,
+            confirmValueChange = { targetValue ->
+                if (targetValue == SheetValue.Hidden || targetValue == SheetValue.PartiallyExpanded) {
+                    allowDismiss
+                } else true
+            }
+        )
+    )
     val scope = rememberCoroutineScope()
     val pagerState = rememberPagerState(
         initialPage = 0,
@@ -63,10 +76,13 @@ fun ScheduleScreen(
 
     LaunchedEffect(viewModel.anySelected) {
         scope.launch {
-            if(viewModel.anySelected)
+            if(viewModel.anySelected) {
                 scaffoldState.bottomSheetState.expand()
-            else
-                scaffoldState.bottomSheetState.partialExpand()
+            } else {
+                allowDismiss = true
+                scaffoldState.bottomSheetState.hide()
+                allowDismiss = false
+            }
         }
     }
 
@@ -105,11 +121,24 @@ fun ScheduleScreen(
                     scheduleCoulds = viewModel.scheduleCoulds,
                     onItemClick = { scheduleCould ->
                         viewModel.onEvent(ScheduleEvents.OnSaveEvent(scheduleCould.name))
-                        scope.launch { scaffoldState.bottomSheetState.partialExpand() }
+                        scope.launch {
+                            allowDismiss = true
+                            scaffoldState.bottomSheetState.hide()
+                            allowDismiss = false
+                        }
+                    },
+                    onClose = {
+                        viewModel.onEvent(ScheduleEvents.OnDeselectAll)
+                        scope.launch {
+                            allowDismiss = true
+                            scaffoldState.bottomSheetState.hide()
+                            allowDismiss = false
+                        }
                     }
                 )
             },
             sheetPeekHeight = 0.dp,
+            sheetDragHandle = {},
             topBar = {
                 TopAppBar(
                     title = {

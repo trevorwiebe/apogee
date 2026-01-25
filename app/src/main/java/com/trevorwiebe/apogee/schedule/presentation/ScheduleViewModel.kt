@@ -85,6 +85,10 @@ class ScheduleViewModel @Inject constructor(
                 }catch (e: Exception){ }
             }
             is ScheduleEvents.OnSaveScheduleCould -> handleSaveScheduleCould(event)
+            is ScheduleEvents.OnDeselectAll -> {
+                timeSlots = timeSlots.map { it.copy(selected = false) }
+                anySelected = false
+            }
         }
     }
 

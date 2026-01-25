@@ -11,4 +11,5 @@ sealed class ScheduleEvents{
         val description: String,
         val color: Color
     ): ScheduleEvents()
+    data object OnDeselectAll: ScheduleEvents()
 }

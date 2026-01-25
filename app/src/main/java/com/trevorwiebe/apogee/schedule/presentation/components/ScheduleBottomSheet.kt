@@ -21,13 +21,20 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Button
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import com.trevorwiebe.apogee.R
 import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.lightenColor
 
@@ -35,7 +42,8 @@ import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.lightenColor
 fun ScheduleBottomSheet(
     modifier: Modifier = Modifier,
     scheduleCoulds: List<ScheduleCould>,
-    onItemClick: (ScheduleCould) -> Unit
+    onItemClick: (ScheduleCould) -> Unit,
+    onClose: () -> Unit
 ) {
 
     val navBarPadding = WindowInsets.navigationBars.asPaddingValues().calculateBottomPadding()
@@ -57,10 +65,24 @@ fun ScheduleBottomSheet(
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.SpaceBetween
         ){
-            Text(
-                text = "Set Activity",
-                fontWeight = FontWeight.Bold
-            )
+            Row(
+                modifier = Modifier.padding(top = 16.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconButton(onClick = onClose) {
+                    Icon(
+                        painter = painterResource(R.drawable.close),
+                        contentDescription = "Close"
+                    )
+                }
+                Text(
+                    text = "Set Activity",
+                    fontSize = 22.sp,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    color = MaterialTheme.colorScheme.onSurface
+                )
+            }
             Button(
                 onClick = {}
             ) {
