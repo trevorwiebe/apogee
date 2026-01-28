@@ -1,6 +1,7 @@
 package com.trevorwiebe.apogee.schedule.presentation
 
 import androidx.compose.ui.graphics.Color
+import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 import kotlin.math.max
 import kotlin.math.min
@@ -58,7 +59,8 @@ object ScheduleVMUtils {
 
     internal fun mapTaskToTime(
         timeList: List<UiTimeSlot>,
-        taskList: List<ScheduleShould>
+        taskList: List<ScheduleShould>,
+        scheduleCouldList: List<ScheduleCould>
     ): List<UiTimeSlot>{
         return timeList.map { time ->
             val task = taskList.find {
@@ -66,7 +68,10 @@ object ScheduleVMUtils {
                 it.endTime >= time.slot.endTime &&
                 it.dayOfWeek == time.slot.dayOfTheWeek
             }
-            time.copy(task = task)
+            val taskName = task?.let { t ->
+                scheduleCouldList.find { it.id == t.scheduleCouldId }
+            }?.name
+            time.copy(taskName = taskName)
         }
     }
 }

@@ -8,7 +8,7 @@ import java.time.LocalTime
 data class ScheduleShould(
     @PrimaryKey(autoGenerate = true)
     val id: Int,
-    val name: String,
+    val scheduleCouldId: Int,
     val startTime: LocalTime,
     val endTime: LocalTime,
     val dayOfWeek: Int

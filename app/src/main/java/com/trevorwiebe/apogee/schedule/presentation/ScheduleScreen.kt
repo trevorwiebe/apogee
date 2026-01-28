@@ -118,9 +118,9 @@ fun ScheduleScreen(
             },
             sheetContent = {
                 ScheduleBottomSheet(
-                    scheduleCoulds = viewModel.scheduleCoulds,
+                    scheduleCoulds = viewModel.scheduleCouldList,
                     onItemClick = { scheduleCould ->
-                        viewModel.onEvent(ScheduleEvents.OnSaveEvent(scheduleCould.name))
+                        viewModel.onEvent(ScheduleEvents.OnSaveEvent(scheduleCould.id))
                         scope.launch {
                             allowDismiss = true
                             scaffoldState.bottomSheetState.hide()

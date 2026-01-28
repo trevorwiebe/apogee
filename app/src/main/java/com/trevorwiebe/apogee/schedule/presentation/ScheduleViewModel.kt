@@ -16,6 +16,7 @@ import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.mapTaskToTime
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalTime
@@ -34,7 +35,8 @@ class ScheduleViewModel @Inject constructor(
     var anySelected by mutableStateOf(false)
     var weekDaySelected by mutableIntStateOf(0)
     var saveButtonEnabled by mutableStateOf(false)
-    var scheduleCoulds by mutableStateOf(emptyList<ScheduleCould>())
+    var scheduleShouldList by mutableStateOf(emptyList<ScheduleShould>())
+    var scheduleCouldList by mutableStateOf(emptyList<ScheduleCould>())
     val dayList = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
 
     private val _snackbarEvent = Channel<String>()
@@ -45,11 +47,10 @@ class ScheduleViewModel @Inject constructor(
             UiTimeSlot(
                 slot = it,
                 selected = false,
-                task = null
+                taskName = null
             )
         }
-        initiateScheduledItems()
-        initiateScheduleCoulds()
+        loadData()
     }
 
     fun onEvent(event: ScheduleEvents){
@@ -66,11 +67,10 @@ class ScheduleViewModel @Inject constructor(
             }
             is ScheduleEvents.OnSaveEvent -> {
                 try{
-                    val title = event.title.ifEmpty { "Task" }
                     val times = calculateStartAndEnd(timeSlots)
                     val scheduleShould = ScheduleShould(
                         id = 0,
-                        name = title,
+                        scheduleCouldId = event.scheduleCouldId,
                         startTime = times.first,
                         endTime = times.second,
                         dayOfWeek = weekDaySelected,
@@ -88,6 +88,21 @@ class ScheduleViewModel @Inject constructor(
             is ScheduleEvents.OnDeselectAll -> {
                 timeSlots = timeSlots.map { it.copy(selected = false) }
                 anySelected = false
+            }
+        }
+    }
+
+    private fun loadData(){
+        viewModelScope.launch {
+            combine(
+                getScheduledShould(),
+                getScheduleCould()
+            ) { shouldList, couldList ->
+                scheduleShouldList = shouldList
+                scheduleCouldList = couldList
+                mapTaskToTime(timeSlots, shouldList, couldList)
+            }.collect { mappedSlots ->
+                timeSlots = mappedSlots
             }
         }
     }
@@ -150,22 +165,6 @@ class ScheduleViewModel @Inject constructor(
         val end = sortedSlots.last().slot.endTime
 
         return start to end
-    }
-
-    private fun initiateScheduledItems(){
-        viewModelScope.launch {
-            getScheduledShould().collect { list ->
-                timeSlots = mapTaskToTime(timeSlots, list)
-            }
-        }
-    }
-
-    private fun initiateScheduleCoulds(){
-        viewModelScope.launch {
-            getScheduleCould().collect { list ->
-                scheduleCoulds = list
-            }
-        }
     }
 
 }

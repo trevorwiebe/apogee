@@ -56,7 +56,7 @@ fun ScheduleListItem(
                     .padding(
                         start = 8.dp,
                         end = 8.dp,
-                        top = if(timeSlot.task == null)
+                        top = if(timeSlot.taskName == null)
                             16.dp else 4.dp
                     ),
                 horizontalArrangement = Arrangement.SpaceBetween
@@ -64,12 +64,12 @@ fun ScheduleListItem(
                 Text(text = timeSlot.slot.startTime.toString())
                 Text(text = timeSlot.slot.endTime.plusNanos(1).toString())
             }
-            if(timeSlot.task == null){
+            if(timeSlot.taskName == null){
                 Spacer(modifier = Modifier.height(16.dp))
             }else{
                 Text(
                     modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 2.dp),
-                    text = "Task: ${timeSlot.task.name}",
+                    text = "Task: ${timeSlot.taskName}",
                     fontSize = 14.sp,
                     color = MaterialTheme.colorScheme.outline
                 )
