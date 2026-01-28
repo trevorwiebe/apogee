@@ -37,7 +37,7 @@ fun LogTimeSlotItem(uiSlot: LogTimeUiSlot) {
         } else {
             Text(
                 modifier = Modifier.padding(start = 8.dp, end = 8.dp, bottom = 2.dp),
-                text = "Scheduled: ${uiSlot.scheduledName}",
+                text = "Activity: ${uiSlot.scheduledName}",
                 fontSize = 14.sp,
                 color = MaterialTheme.colorScheme.outline
             )
