@@ -5,5 +5,5 @@ import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 
 data class LogTimeUiSlot(
     val slot: DateTimeSlot,
-    val scheduleShould: ScheduleShould?
+    val scheduledName: String? = null
 )

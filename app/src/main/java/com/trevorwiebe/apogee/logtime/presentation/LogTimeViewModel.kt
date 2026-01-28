@@ -6,10 +6,12 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.trevorwiebe.apogee.logtime.domain.usecases.CreateDateTimeSlots
-import com.trevorwiebe.apogee.schedule.data.ScheduleShould
+import com.trevorwiebe.apogee.schedule.data.ScheduleCould
+import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import java.time.LocalDate
@@ -20,7 +22,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LogTimeViewModel @Inject constructor(
     private val createDateTimeSlots: CreateDateTimeSlots,
-    private val getScheduledShould: GetScheduledShould
+    private val getScheduledShould: GetScheduledShould,
+    private val getScheduleCould: GetScheduleCould
 ) : ViewModel() {
 
     companion object {
@@ -38,14 +41,15 @@ class LogTimeViewModel @Inject constructor(
     private val _scrollToNowEvent = Channel<Int>()
     val scrollToNowEvent = _scrollToNowEvent.receiveAsFlow()
 
-    private var scheduleShouldList: List<ScheduleShould> = emptyList()
+    private var scheduleShouldList: List<com.trevorwiebe.apogee.schedule.data.ScheduleShould> = emptyList()
+    private var scheduleCouldList: List<ScheduleCould> = emptyList()
 
     private var loadedStartDate: LocalDate = LocalDate.now()
     private var loadedEndDate: LocalDate = LocalDate.now()
 
     init {
         initializeSlots()
-        observeScheduleShould()
+        observeSchedules()
     }
 
     private fun initializeSlots() {
@@ -56,7 +60,7 @@ class LogTimeViewModel @Inject constructor(
         loadedEndDate = today.plusDays(INITIAL_DAYS_AFTER.toLong())
 
         val dateTimeSlots = createDateTimeSlots.forRange(loadedStartDate, loadedEndDate)
-        slots = dateTimeSlots.map { LogTimeUiSlot(slot = it, scheduleShould = null) }
+        slots = dateTimeSlots.map { LogTimeUiSlot(slot = it) }
 
         val daysFromStart = ChronoUnit.DAYS.between(loadedStartDate, today).toInt()
         val slotIndexInDay = createDateTimeSlots.slotIndexForTime(now)
@@ -67,11 +71,17 @@ class LogTimeViewModel @Inject constructor(
         )
     }
 
-    private fun observeScheduleShould() {
+    private fun observeSchedules() {
         viewModelScope.launch {
-            getScheduledShould().collect { list ->
-                scheduleShouldList = list
-                slots = mapScheduleShouldToSlots(slots)
+            combine(
+                getScheduledShould(),
+                getScheduleCould()
+            ) { shouldList, couldList ->
+                scheduleShouldList = shouldList
+                scheduleCouldList = couldList
+                mapScheduleShouldToSlots(slots)
+            }.collect { updatedSlots ->
+                slots = updatedSlots
             }
         }
     }
@@ -83,7 +93,10 @@ class LogTimeViewModel @Inject constructor(
                 task.startTime <= uiSlot.slot.startTime &&
                 task.endTime >= uiSlot.slot.endTime
             }
-            uiSlot.copy(scheduleShould = matchingTask)
+            val scheduledName = matchingTask?.let { task ->
+                scheduleCouldList.find { it.id == task.scheduleCouldId }?.name
+            }
+            uiSlot.copy(scheduledName = scheduledName)
         }
     }
 
@@ -112,7 +125,7 @@ class LogTimeViewModel @Inject constructor(
     private fun loadEarlierDates() {
         val newStartDate = loadedStartDate.minusDays(LOAD_THRESHOLD_DAYS.toLong())
         val newSlots = createDateTimeSlots.forRange(newStartDate, loadedStartDate.minusDays(1))
-            .map { LogTimeUiSlot(slot = it, scheduleShould = null) }
+            .map { LogTimeUiSlot(slot = it) }
 
         loadedStartDate = newStartDate
         slots = mapScheduleShouldToSlots(newSlots) + slots
@@ -121,7 +134,7 @@ class LogTimeViewModel @Inject constructor(
     private fun loadLaterDates() {
         val newEndDate = loadedEndDate.plusDays(LOAD_THRESHOLD_DAYS.toLong())
         val newSlots = createDateTimeSlots.forRange(loadedEndDate.plusDays(1), newEndDate)
-            .map { LogTimeUiSlot(slot = it, scheduleShould = null) }
+            .map { LogTimeUiSlot(slot = it) }
 
         loadedEndDate = newEndDate
         slots = slots + mapScheduleShouldToSlots(newSlots)
