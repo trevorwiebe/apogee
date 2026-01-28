@@ -1,4 +1,4 @@
-package com.trevorwiebe.apogee.schedule.data
+package com.trevorwiebe.apogee.logtime.data
 
 import androidx.room.Dao
 import androidx.room.Delete
@@ -9,22 +9,22 @@ import androidx.room.Update
 import kotlinx.coroutines.flow.Flow
 
 @Dao
-interface ScheduleDidDao {
+interface DidDao {
 
-    @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insert(scheduleDid: ScheduleDid)
+    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    suspend fun insert(did: Did)
 
     @Update
-    suspend fun update(scheduleDid: ScheduleDid)
+    suspend fun update(did: Did)
 
     @Delete
-    suspend fun delete(scheduleDid: ScheduleDid)
+    suspend fun delete(did: Did)
 
     @Query("SELECT * FROM schedule_did WHERE id = :id")
-    suspend fun getById(id: Int): ScheduleDid?
+    suspend fun getById(id: Int): Did?
 
     @Query("SELECT * FROM schedule_did ORDER BY name ASC")
-    fun getAllFlow(): Flow<List<ScheduleDid>>
+    fun getAllFlow(): Flow<List<Did>>
 
     @Query("DELETE FROM schedule_did WHERE id = :id")
     suspend fun deleteById(id: Int)
