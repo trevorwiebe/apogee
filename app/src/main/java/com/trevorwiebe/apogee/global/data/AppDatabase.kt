@@ -11,7 +11,7 @@ import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 import com.trevorwiebe.apogee.schedule.data.ScheduleShouldDao
 
 @Database(
-    entities = [ScheduleShould::class, Did::class, ScheduleCould::class],
+    entities = [ScheduleShould::class, ScheduleCould::class, Did::class,],
     version = 1,
     exportSchema = true
 )
