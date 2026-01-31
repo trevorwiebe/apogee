@@ -15,7 +15,6 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.Runs
-import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -93,15 +92,6 @@ class ScheduleViewModelTest {
 
         // Then
         assertFalse(viewModel.anySelected)
-    }
-
-    @Test
-    fun `init sets saveButtonEnabled to false`() {
-        // When
-        viewModel = createViewModel()
-
-        // Then
-        assertFalse(viewModel.saveButtonEnabled)
     }
 
     @Test
@@ -251,68 +241,16 @@ class ScheduleViewModelTest {
 
     // endregion
 
-    // region Selection Validation Tests
-
-    @Test
-    fun `saveButtonEnabled is true when single slot selected`() {
-        // Given
-        viewModel = createViewModel()
-
-        // When
-        viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
-
-        // Then
-        assertTrue(viewModel.saveButtonEnabled)
-    }
-
-    @Test
-    fun `saveButtonEnabled is true when consecutive slots selected`() {
-        // Given
-        viewModel = createViewModel()
-
-        // When - select 3 consecutive slots
-        viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
-        viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[1]))
-        viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[2]))
-
-        // Then
-        assertTrue(viewModel.saveButtonEnabled)
-    }
-
-    @Test
-    fun `saveButtonEnabled is false when non-consecutive slots selected`() {
-        // Given
-        viewModel = createViewModel()
-
-        // When - select slot 0 and slot 2 (skipping slot 1)
-        viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
-        viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[2]))
-
-        // Then
-        assertFalse(viewModel.saveButtonEnabled)
-    }
-
-    @Test
-    fun `saveButtonEnabled is false when no slots selected`() {
-        // Given
-        viewModel = createViewModel()
-
-        // Then
-        assertFalse(viewModel.saveButtonEnabled)
-    }
-
-    // endregion
-
     // region OnSaveEvent Tests
 
     @Test
-    fun `OnSaveEvent saves schedule with correct times`() = runTest {
+    fun `OnSaveEvent saves individual schedule for each selected slot`() = runTest {
         // Given
         viewModel = createViewModel()
-        val capturedSchedule = slot<ScheduleShould>()
-        coEvery { saveScheduleShould(capture(capturedSchedule)) } just Runs
+        val capturedSchedules = mutableListOf<ScheduleShould>()
+        coEvery { saveScheduleShould(capture(capturedSchedules)) } just Runs
 
-        // Select first two slots (00:00 - 00:30)
+        // Select first two slots (00:00-00:15 and 00:15-00:30)
         viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
         viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[1]))
 
@@ -320,11 +258,19 @@ class ScheduleViewModelTest {
         viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
-        // Then
-        coVerify { saveScheduleShould(any()) }
-        assertEquals(100, capturedSchedule.captured.scheduleCouldId)
-        assertEquals(LocalTime.of(0, 0), capturedSchedule.captured.startTime)
-        assertEquals(LocalTime.of(0, 29, 59, 999_999_999), capturedSchedule.captured.endTime)
+        // Then - should save two individual schedules
+        coVerify(exactly = 2) { saveScheduleShould(any()) }
+        assertEquals(2, capturedSchedules.size)
+
+        // First slot: 00:00-00:15
+        assertEquals(100, capturedSchedules[0].scheduleCouldId)
+        assertEquals(LocalTime.of(0, 0), capturedSchedules[0].startTime)
+        assertEquals(LocalTime.of(0, 14, 59, 999_999_999), capturedSchedules[0].endTime)
+
+        // Second slot: 00:15-00:30
+        assertEquals(100, capturedSchedules[1].scheduleCouldId)
+        assertEquals(LocalTime.of(0, 15), capturedSchedules[1].startTime)
+        assertEquals(LocalTime.of(0, 29, 59, 999_999_999), capturedSchedules[1].endTime)
     }
 
     @Test
@@ -349,8 +295,8 @@ class ScheduleViewModelTest {
     fun `OnSaveEvent uses current weekDaySelected`() = runTest {
         // Given
         viewModel = createViewModel()
-        val capturedSchedule = slot<ScheduleShould>()
-        coEvery { saveScheduleShould(capture(capturedSchedule)) } just Runs
+        val capturedSchedules = mutableListOf<ScheduleShould>()
+        coEvery { saveScheduleShould(capture(capturedSchedules)) } just Runs
 
         // Note: weekDaySelected defaults to 0, we'd need a setter or event to change it
         // For now, test with default value
@@ -361,24 +307,27 @@ class ScheduleViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(0, capturedSchedule.captured.dayOfWeek)
+        assertEquals(0, capturedSchedules[0].dayOfWeek)
     }
 
     @Test
-    fun `OnSaveEvent does not save when slots have gaps`() = runTest {
+    fun `OnSaveEvent saves non-consecutive slots as individual schedules`() = runTest {
         // Given
         viewModel = createViewModel()
-        // Select non-consecutive slots
+        val capturedSchedules = mutableListOf<ScheduleShould>()
+        coEvery { saveScheduleShould(capture(capturedSchedules)) } just Runs
+
+        // Select non-consecutive slots (slot 0 and slot 2, skipping slot 1)
         viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
-        viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[2])) // Gap at slot 1
-        assertFalse(viewModel.saveButtonEnabled)
+        viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[2]))
 
         // When
         viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
-        // Then - save should not be called due to exception
-        coVerify(exactly = 0) { saveScheduleShould(any()) }
+        // Then - both slots should be saved as individual schedules
+        coVerify(exactly = 2) { saveScheduleShould(any()) }
+        assertEquals(2, capturedSchedules.size)
     }
 
     // endregion

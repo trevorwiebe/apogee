@@ -19,7 +19,6 @@ import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
-import java.time.LocalTime
 import javax.inject.Inject
 
 @HiltViewModel
@@ -34,7 +33,6 @@ class ScheduleViewModel @Inject constructor(
     var timeSlots by mutableStateOf(emptyList<UiTimeSlot>())
     var anySelected by mutableStateOf(false)
     var weekDaySelected by mutableIntStateOf(0)
-    var saveButtonEnabled by mutableStateOf(false)
     var scheduleShouldList by mutableStateOf(emptyList<ScheduleShould>())
     var scheduleCouldList by mutableStateOf(emptyList<ScheduleCould>())
     val dayList = listOf("Monday", "Tuesday", "Wednesday", "Thursday", "Friday", "Saturday", "Sunday")
@@ -91,23 +89,24 @@ class ScheduleViewModel @Inject constructor(
     }
 
     private fun handleSaveEvent(event: ScheduleEvents.OnSaveEvent){
-        try{
-            val times = calculateStartAndEnd(timeSlots)
-            val scheduleShould = ScheduleShould(
+        val selectedSlots = timeSlots.filter { it.selected }
+        if (selectedSlots.isEmpty()) return
+
+        val scheduleShouldItems = selectedSlots.map { uiTimeSlot ->
+            ScheduleShould(
                 id = 0,
                 scheduleCouldId = event.scheduleCouldId,
-                startTime = times.first,
-                endTime = times.second,
+                startTime = uiTimeSlot.slot.startTime,
+                endTime = uiTimeSlot.slot.endTime,
                 dayOfWeek = weekDaySelected,
             )
+        }
 
-            viewModelScope.launch {
-                saveScheduleShould(scheduleShould)
-                timeSlots = timeSlots.map { it.copy(selected = false) }
-                anySelected = false
-            }
-
-        }catch (e: Exception){ }
+        viewModelScope.launch {
+            scheduleShouldItems.forEach { saveScheduleShould(it) }
+            timeSlots = timeSlots.map { it.copy(selected = false) }
+            anySelected = false
+        }
     }
 
     private fun handleSaveScheduleCould(event: ScheduleEvents.OnSaveScheduleCould){
@@ -136,43 +135,10 @@ class ScheduleViewModel @Inject constructor(
                 it
             }
         }
-
-        saveButtonEnabled = try{
-            calculateStartAndEnd(timeSlots)
-            true
-        }catch (e: Exception){
-            false
-        }
     }
 
     private fun setAnySelected(){
         anySelected = timeSlots.any { it.selected }
-    }
-
-    private fun calculateStartAndEnd(list: List<UiTimeSlot>): Pair<LocalTime, LocalTime> {
-        val sortedSlots = list.filter { it.selected }.sortedBy { it.slot.startTime }
-
-        if (sortedSlots.isEmpty()) {
-            throw Exception("No time slots selected")
-        }
-
-        var previousStartMinutes: Int? = null
-
-        sortedSlots.forEach { uiSlot ->
-            val slot = uiSlot.slot
-            val currentStartMinutes = slot.startTime.hour * 60 + slot.startTime.minute
-
-            if (previousStartMinutes != null && currentStartMinutes != previousStartMinutes + 15) {
-                throw Exception("There is a time gap")
-            }
-
-            previousStartMinutes = currentStartMinutes
-        }
-
-        val start = sortedSlots.first().slot.startTime
-        val end = sortedSlots.last().slot.endTime
-
-        return start to end
     }
 
 }
