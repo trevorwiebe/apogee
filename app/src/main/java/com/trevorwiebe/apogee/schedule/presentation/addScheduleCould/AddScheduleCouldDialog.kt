@@ -1,14 +1,18 @@
 package com.trevorwiebe.apogee.schedule.presentation.addScheduleCould
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
+import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -69,16 +73,19 @@ fun AddScheduleCouldDialog(
 
             SystemBarColorForFullScreenDialog()
 
-            Column(
+            Box(
                 modifier = Modifier
                     .background(MaterialTheme.colorScheme.surface)
                     .fillMaxSize()
-                    .verticalScroll(scrollState)
             ) {
-
                 Column(
-                    modifier = Modifier.safeDrawingPadding()
-                ){
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .verticalScroll(scrollState)
+                ) {
+                    Column(
+                        modifier = Modifier.safeDrawingPadding()
+                    ) {
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
@@ -175,10 +182,19 @@ fun AddScheduleCouldDialog(
 
                     Spacer(Modifier.height(8.dp))
 
-                    ColorPicker(
-                        color = color
-                    )
+                        ColorPicker(
+                            color = color
+                        )
+                    }
                 }
+
+                // Translucent top bar overlay
+                Box(
+                    modifier = Modifier
+                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                        .fillMaxWidth()
+                        .height(WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+                )
             }
         }
     }
