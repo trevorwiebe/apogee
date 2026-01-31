@@ -36,7 +36,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.trevorwiebe.apogee.R
-import com.trevorwiebe.apogee.schedule.presentation.addScheduleCould.AddScheduleCouldDialog
+import com.trevorwiebe.apogee.global.presentation.ScheduleCouldDialog
 import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleBottomSheet
 import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleDayList
 import com.trevorwiebe.apogee.schedule.presentation.components.Tabs
@@ -47,6 +47,7 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun ScheduleScreen(
+    onNavigate: (String) -> Unit,
     viewModel: ScheduleViewModel = hiltViewModel()
 ) {
 
@@ -136,6 +137,9 @@ fun ScheduleScreen(
                             scaffoldState.bottomSheetState.hide()
                             allowDismiss = false
                         }
+                    },
+                    onEditScheduleCoulds = {
+                        onNavigate("editschedulecould")
                     }
                 )
             },
@@ -199,9 +203,16 @@ fun ScheduleScreen(
         }
     }
 
-    AddScheduleCouldDialog(sheetOpen = scheduleCouldDialogOpen){
-        title, description, color ->
-        viewModel.onEvent(ScheduleEvents.OnSaveScheduleCould(title, description, color))
-        scheduleCouldDialogOpen.value = false
+    if (scheduleCouldDialogOpen.value) {
+        ScheduleCouldDialog(
+            scheduleCould = null,
+            onDismiss = {
+                scheduleCouldDialogOpen.value = false
+            },
+            onSave = { _, name, description, color ->
+                viewModel.onEvent(ScheduleEvents.OnSaveScheduleCould(name, description, color))
+                scheduleCouldDialogOpen.value = false
+            }
+        )
     }
 }

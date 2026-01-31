@@ -42,6 +42,7 @@ fun ScheduleBottomSheet(
     modifier: Modifier = Modifier,
     scheduleCoulds: List<ScheduleCould>,
     onItemClick: (ScheduleCould) -> Unit,
+    onEditScheduleCoulds: () -> Unit,
     onClose: () -> Unit
 ) {
 
@@ -78,7 +79,7 @@ fun ScheduleBottomSheet(
                 color = MaterialTheme.colorScheme.onSurface
             )
             Button(
-                onClick = {}
+                onClick = onEditScheduleCoulds
             ) {
                 Text(text = "Edit Activities")
             }

@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import com.trevorwiebe.apogee.editschedulecould.presentation.EditScheduleCouldScreen
 import com.trevorwiebe.apogee.logtime.presentation.LogTimeScreen
 import com.trevorwiebe.apogee.schedule.presentation.ScheduleScreen
 import com.trevorwiebe.apogee.ui.theme.ApogeeTheme
@@ -34,7 +35,15 @@ class MainActivity : ComponentActivity() {
                     }
 
                     composable("schedule"){
-                        ScheduleScreen()
+                        ScheduleScreen(
+                            onNavigate = navController::navigate
+                        )
+                    }
+
+                    composable("editschedulecould") {
+                        EditScheduleCouldScreen(
+                            onNavigateBack = { navController.popBackStack() }
+                        )
                     }
                 }
             }

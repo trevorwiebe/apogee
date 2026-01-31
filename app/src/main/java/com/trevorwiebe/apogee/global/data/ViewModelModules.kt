@@ -1,5 +1,7 @@
 package com.trevorwiebe.apogee.global.data
 
+import com.trevorwiebe.apogee.editschedulecould.domain.usecases.DeleteScheduleCould
+import com.trevorwiebe.apogee.editschedulecould.domain.usecases.UpdateScheduleCould
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
 import com.trevorwiebe.apogee.logtime.domain.usecases.CreateDateTimeSlots
 import com.trevorwiebe.apogee.schedule.data.ScheduleCouldDao
@@ -60,5 +62,21 @@ object ViewModelModules {
         scheduleCouldDao: ScheduleCouldDao
     ): GetScheduleCould {
         return GetScheduleCould(scheduleCouldDao)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun providesUpdateScheduleCould(
+        scheduleCouldDao: ScheduleCouldDao
+    ): UpdateScheduleCould {
+        return UpdateScheduleCould(scheduleCouldDao)
+    }
+
+    @Provides
+    @ViewModelScoped
+    fun providesDeleteScheduleCould(
+        scheduleCouldDao: ScheduleCouldDao
+    ): DeleteScheduleCould {
+        return DeleteScheduleCould(scheduleCouldDao)
     }
 }

@@ -1,4 +1,4 @@
-package com.trevorwiebe.apogee.schedule.presentation.addScheduleCould
+package com.trevorwiebe.apogee.global.presentation
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -32,26 +32,27 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
+import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.PlatformTextStyle
-import androidx.compose.ui.text.input.KeyboardCapitalization
-import androidx.compose.ui.text.style.LineHeightStyle
 import com.trevorwiebe.apogee.R
-import com.trevorwiebe.apogee.global.presentation.ATextField
+import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.ui.SystemBarColorForFullScreenDialog
 import org.stanzamusic.stanza.presentation.saveCollection.coverCreator.colorPicker.ColorPicker
 
 @Composable
-fun AddScheduleCouldDialog(
-    sheetOpen: MutableState<Boolean>,
-    onSave: (title: String, description: String, color: Color) -> Unit
+fun ScheduleCouldDialog(
+    scheduleCould: ScheduleCould?,
+    onDismiss: () -> Unit,
+    onSave: (id: Int?, name: String, description: String, color: Color) -> Unit
 ) {
-
+    val isEditMode = scheduleCould != null
     val primaryColor = MaterialTheme.colorScheme.primary
     val scrollState = rememberScrollState()
 
@@ -60,55 +61,39 @@ fun AddScheduleCouldDialog(
         restore = { mutableStateOf(Color(it.toULong())) }
     )
 
-    val scheduleCouldTitle = rememberSaveable { mutableStateOf("") }
-    val scheduleCouldDescription = rememberSaveable { mutableStateOf("") }
-    val color = rememberSaveable(saver = colorSaver) { mutableStateOf(primaryColor) }
+    val scheduleCouldTitle = rememberSaveable { mutableStateOf(scheduleCould?.name ?: "") }
+    val scheduleCouldDescription = rememberSaveable { mutableStateOf(scheduleCould?.description ?: "") }
+    val color = rememberSaveable(saver = colorSaver) { mutableStateOf(scheduleCould?.color ?: primaryColor) }
 
-    fun resetState(){
-        scheduleCouldTitle.value = ""
-        scheduleCouldDescription.value = ""
-        color.value = primaryColor
-    }
+    Dialog(
+        properties = DialogProperties(
+            usePlatformDefaultWidth = false,
+            decorFitsSystemWindows = false
+        ),
+        onDismissRequest = onDismiss
+    ) {
+        SystemBarColorForFullScreenDialog()
 
-    if (sheetOpen.value) {
-        Dialog(
-            properties = DialogProperties(
-                usePlatformDefaultWidth = false,
-                decorFitsSystemWindows = false
-            ),
-            onDismissRequest = {
-                sheetOpen.value = false
-                resetState()
-            },
+        Box(
+            modifier = Modifier
+                .background(MaterialTheme.colorScheme.surface)
+                .fillMaxSize()
         ) {
-
-            SystemBarColorForFullScreenDialog()
-
-            Box(
+            Column(
                 modifier = Modifier
-                    .background(MaterialTheme.colorScheme.surface)
                     .fillMaxSize()
+                    .verticalScroll(scrollState)
             ) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .verticalScroll(scrollState)
+                    modifier = Modifier.safeDrawingPadding()
                 ) {
-                    Column(
-                        modifier = Modifier.safeDrawingPadding()
-                    ) {
                     Row(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth(),
                         verticalAlignment = Alignment.CenterVertically
                     ) {
-                        IconButton(
-                            onClick = {
-                                sheetOpen.value = false
-                                resetState()
-                            }
-                        ) {
+                        IconButton(onClick = onDismiss) {
                             Icon(
                                 painter = painterResource(R.drawable.close),
                                 contentDescription = null,
@@ -117,7 +102,7 @@ fun AddScheduleCouldDialog(
                         }
                         Spacer(Modifier.width(8.dp))
                         Text(
-                            text = "Add Activity",
+                            text = if (isEditMode) "Edit Activity" else "Add Activity",
                             fontSize = 22.sp,
                             maxLines = 1,
                             overflow = TextOverflow.Ellipsis,
@@ -127,55 +112,56 @@ fun AddScheduleCouldDialog(
                         Button(
                             onClick = {
                                 onSave(
+                                    scheduleCould?.id,
                                     scheduleCouldTitle.value,
                                     scheduleCouldDescription.value,
                                     color.value
                                 )
-                                resetState()
                             },
                             enabled = scheduleCouldTitle.value.isNotEmpty()
                         ) {
-                            Text(
-                                text = "Save"
-                            )
+                            Text(text = "Save")
                         }
                     }
 
                     Spacer(Modifier.height(8.dp))
 
-                    Card(
-                        modifier = Modifier.padding(horizontal = 8.dp)
-                    ){
-                        Row(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .padding(8.dp),
-                            verticalAlignment = Alignment.Top
-                        ){
-
-                            Icon(
-                                painter = painterResource(R.drawable.info),
-                                contentDescription = null,
-                                tint = MaterialTheme.colorScheme.primary
-                            )
-                            Spacer(Modifier.width(8.dp))
-                            Text(
-                                text = "Add activities that describe how you want to spend your time, for example; Sleeping, Exercising, Working, etc. \n \nOnce created, place them on your schedule to follow.",
-                                fontSize = 14.sp,
-                                style = TextStyle(
-                                    platformStyle = PlatformTextStyle(
-                                        includeFontPadding = false
-                                    ),
-                                    lineHeightStyle = LineHeightStyle(
-                                        alignment = LineHeightStyle.Alignment.Top,
-                                        trim = LineHeightStyle.Trim.Both
+                    if (!isEditMode) {
+                        Card(
+                            modifier = Modifier.padding(horizontal = 8.dp)
+                        ) {
+                            Row(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .padding(8.dp),
+                                verticalAlignment = Alignment.Top
+                            ) {
+                                Icon(
+                                    painter = painterResource(R.drawable.info),
+                                    contentDescription = null,
+                                    tint = MaterialTheme.colorScheme.primary
+                                )
+                                Spacer(Modifier.width(8.dp))
+                                Text(
+                                    text = "Add activities that describe how you want to spend your time, for example; Sleeping, Exercising, Working, etc. \n \nOnce created, place them on your schedule to follow.",
+                                    fontSize = 14.sp,
+                                    style = TextStyle(
+                                        platformStyle = PlatformTextStyle(
+                                            includeFontPadding = false
+                                        ),
+                                        lineHeightStyle = LineHeightStyle(
+                                            alignment = LineHeightStyle.Alignment.Top,
+                                            trim = LineHeightStyle.Trim.Both
+                                        )
                                     )
                                 )
-                            )
+                            }
                         }
-                    }
 
-                    Spacer(Modifier.height(16.dp))
+                        Spacer(Modifier.height(16.dp))
+                    } else {
+                        Spacer(Modifier.height(8.dp))
+                    }
 
                     ATextField(
                         modifier = Modifier
@@ -200,20 +186,16 @@ fun AddScheduleCouldDialog(
 
                     Spacer(Modifier.height(8.dp))
 
-                        ColorPicker(
-                            color = color
-                        )
-                    }
+                    ColorPicker(color = color)
                 }
-
-                // Translucent top bar overlay
-                Box(
-                    modifier = Modifier
-                        .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
-                        .fillMaxWidth()
-                        .height(WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
-                )
             }
+
+            Box(
+                modifier = Modifier
+                    .background(MaterialTheme.colorScheme.surface.copy(alpha = 0.8f))
+                    .fillMaxWidth()
+                    .height(WindowInsets.systemBars.asPaddingValues().calculateTopPadding())
+            )
         }
     }
 }
