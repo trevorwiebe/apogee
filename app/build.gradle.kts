@@ -1,3 +1,4 @@
+import com.android.build.api.dsl.ApkSigningConfig
 import com.android.build.api.dsl.ApplicationExtension
 
 plugins {
@@ -23,6 +24,12 @@ configure<ApplicationExtension> {
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
 
+    signingConfigs {
+        create("release") {
+            configureSigning()
+        }
+    }
+
     buildTypes {
         release {
             isMinifyEnabled = false
@@ -30,6 +37,7 @@ configure<ApplicationExtension> {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro"
             )
+            signingConfig = signingConfigs.getByName("release")
         }
     }
     compileOptions {
@@ -81,4 +89,36 @@ dependencies {
     androidTestImplementation(libs.androidx.compose.ui.test.junit4)
     debugImplementation(libs.androidx.compose.ui.tooling)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
+}
+
+fun ApkSigningConfig.configureSigning() {
+    val localKeyStorePath = System.getenv("KEY_STORE_PATH_LOCAL")
+    val ciKeyStorePath = System.getenv("KEY_STORE_PATH_CI")
+
+    val resolvedKeystorePath = when {
+        !localKeyStorePath.isNullOrEmpty() -> localKeyStorePath
+        !ciKeyStorePath.isNullOrEmpty() -> ciKeyStorePath
+        else -> throw GradleException("No valid keystore path found in environment variables.")
+    }
+
+    val resolvedKeystoreFile = File(resolvedKeystorePath)
+
+    if (!resolvedKeystoreFile.exists()) {
+        throw GradleException("Keystore file not found at: $resolvedKeystorePath")
+    }
+
+    storeFile = resolvedKeystoreFile
+    storePassword = System.getenv("KEY_STORE_PASSWORD")
+    keyAlias = System.getenv("SIGNING_KEY_ALIAS") ?: "key0"
+    keyPassword = System.getenv("KEY_PASSWORD")
+
+    if (storePassword.isNullOrBlank()) {
+        throw GradleException("Environment variable KEY_STORE_PASSWORD is missing or blank.")
+    }
+    if (keyAlias.isNullOrBlank()) {
+        throw GradleException("Environment variable SIGNING_KEY_ALIAS is missing or blank.")
+    }
+    if (keyPassword.isNullOrBlank()) {
+        throw GradleException("Environment variable KEY_PASSWORD is missing or blank.")
+    }
 }
