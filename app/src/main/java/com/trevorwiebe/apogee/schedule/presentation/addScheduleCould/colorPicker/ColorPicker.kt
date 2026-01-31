@@ -113,7 +113,7 @@ fun ColorPicker(
         colors100
     )
 
-    Column(modifier = Modifier.fillMaxSize()){
+    Column(modifier = Modifier.fillMaxWidth()){
 
         Text(
             modifier = Modifier.padding(8.dp),
@@ -163,9 +163,7 @@ fun ColorPicker(
             when (it) {
                 0 -> {
                     Column(
-                        modifier = Modifier
-                            .height(450.dp)
-                            .padding(8.dp)
+                        modifier = Modifier.padding(8.dp)
                     ) {
                         Column(
                             modifier = Modifier.clip(RoundedCornerShape(8.dp))
@@ -220,9 +218,7 @@ fun ColorPicker(
 
                 1 -> {
                     Column(
-                        modifier = Modifier
-                            .height(450.dp)
-                            .padding(16.dp)
+                        modifier = Modifier.padding(8.dp)
                     ) {
                         Column(
                             verticalArrangement = Arrangement.Center,
