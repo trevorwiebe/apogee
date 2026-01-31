@@ -103,7 +103,7 @@ class ScheduleViewModel @Inject constructor(
         }
 
         viewModelScope.launch {
-            scheduleShouldItems.forEach { saveScheduleShould(it) }
+            saveScheduleShould(scheduleShouldItems)
             timeSlots = timeSlots.map { it.copy(selected = false) }
             anySelected = false
         }

@@ -15,6 +15,7 @@ import io.mockk.every
 import io.mockk.just
 import io.mockk.mockk
 import io.mockk.Runs
+import io.mockk.slot
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -51,7 +52,7 @@ class ScheduleViewModelTest {
 
         every { getScheduledShould() } returns flowOf(emptyList())
         every { getScheduleCould() } returns flowOf(emptyList())
-        coEvery { saveScheduleShould(any()) } just Runs
+        coEvery { saveScheduleShould(any<List<ScheduleShould>>()) } just Runs
         coEvery { saveScheduleCould(any()) } just Runs
     }
 
@@ -247,8 +248,8 @@ class ScheduleViewModelTest {
     fun `OnSaveEvent saves individual schedule for each selected slot`() = runTest {
         // Given
         viewModel = createViewModel()
-        val capturedSchedules = mutableListOf<ScheduleShould>()
-        coEvery { saveScheduleShould(capture(capturedSchedules)) } just Runs
+        val capturedList = slot<List<ScheduleShould>>()
+        coEvery { saveScheduleShould(capture(capturedList)) } just Runs
 
         // Select first two slots (00:00-00:15 and 00:15-00:30)
         viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
@@ -258,8 +259,9 @@ class ScheduleViewModelTest {
         viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
-        // Then - should save two individual schedules
-        coVerify(exactly = 2) { saveScheduleShould(any()) }
+        // Then - should save a list with two schedules
+        coVerify(exactly = 1) { saveScheduleShould(any<List<ScheduleShould>>()) }
+        val capturedSchedules = capturedList.captured
         assertEquals(2, capturedSchedules.size)
 
         // First slot: 00:00-00:15
@@ -295,8 +297,8 @@ class ScheduleViewModelTest {
     fun `OnSaveEvent uses current weekDaySelected`() = runTest {
         // Given
         viewModel = createViewModel()
-        val capturedSchedules = mutableListOf<ScheduleShould>()
-        coEvery { saveScheduleShould(capture(capturedSchedules)) } just Runs
+        val capturedList = slot<List<ScheduleShould>>()
+        coEvery { saveScheduleShould(capture(capturedList)) } just Runs
 
         // Note: weekDaySelected defaults to 0, we'd need a setter or event to change it
         // For now, test with default value
@@ -307,15 +309,15 @@ class ScheduleViewModelTest {
         advanceUntilIdle()
 
         // Then
-        assertEquals(0, capturedSchedules[0].dayOfWeek)
+        assertEquals(0, capturedList.captured[0].dayOfWeek)
     }
 
     @Test
     fun `OnSaveEvent saves non-consecutive slots as individual schedules`() = runTest {
         // Given
         viewModel = createViewModel()
-        val capturedSchedules = mutableListOf<ScheduleShould>()
-        coEvery { saveScheduleShould(capture(capturedSchedules)) } just Runs
+        val capturedList = slot<List<ScheduleShould>>()
+        coEvery { saveScheduleShould(capture(capturedList)) } just Runs
 
         // Select non-consecutive slots (slot 0 and slot 2, skipping slot 1)
         viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
@@ -325,9 +327,9 @@ class ScheduleViewModelTest {
         viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
-        // Then - both slots should be saved as individual schedules
-        coVerify(exactly = 2) { saveScheduleShould(any()) }
-        assertEquals(2, capturedSchedules.size)
+        // Then - both slots should be saved in a single list
+        coVerify(exactly = 1) { saveScheduleShould(any<List<ScheduleShould>>()) }
+        assertEquals(2, capturedList.captured.size)
     }
 
     // endregion

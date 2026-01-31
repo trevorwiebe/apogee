@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "8192e024d6f2da8b921a689e37bcb5d2",
+    "identityHash": "32c96fd56f3b64deacc5bb182dae7e35",
     "entities": [
       {
         "tableName": "schedule_should",
@@ -44,31 +44,19 @@
           "columnNames": [
             "id"
           ]
-        }
-      },
-      {
-        "tableName": "schedule_did",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
-        "fields": [
+        },
+        "indices": [
           {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "name",
-            "columnName": "name",
-            "affinity": "TEXT",
-            "notNull": true
+            "name": "index_schedule_should_dayOfWeek_startTime",
+            "unique": true,
+            "columnNames": [
+              "dayOfWeek",
+              "startTime"
+            ],
+            "orders": [],
+            "createSql": "CREATE UNIQUE INDEX IF NOT EXISTS `index_schedule_should_dayOfWeek_startTime` ON `${TABLE_NAME}` (`dayOfWeek`, `startTime`)"
           }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        }
+        ]
       },
       {
         "tableName": "schedule_could",
@@ -105,11 +93,35 @@
             "id"
           ]
         }
+      },
+      {
+        "tableName": "schedule_did",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL)",
+        "fields": [
+          {
+            "fieldPath": "id",
+            "columnName": "id",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "name",
+            "columnName": "name",
+            "affinity": "TEXT",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": true,
+          "columnNames": [
+            "id"
+          ]
+        }
       }
     ],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '8192e024d6f2da8b921a689e37bcb5d2')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '32c96fd56f3b64deacc5bb182dae7e35')"
     ]
   }
 }

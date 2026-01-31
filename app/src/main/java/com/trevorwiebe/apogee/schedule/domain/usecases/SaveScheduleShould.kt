@@ -10,4 +10,8 @@ class SaveScheduleShould(
     suspend operator fun invoke(scheduleShould: ScheduleShould) {
         scheduleShouldDao.insert(scheduleShould)
     }
+
+    suspend operator fun invoke(scheduleShouldList: List<ScheduleShould>) {
+        scheduleShouldDao.insertAll(scheduleShouldList)
+    }
 }

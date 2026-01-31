@@ -14,6 +14,9 @@ interface ScheduleShouldDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(scheduleShould: ScheduleShould)
 
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertAll(scheduleShouldList: List<ScheduleShould>)
+
     @Update
     suspend fun update(scheduleShould: ScheduleShould)
 
