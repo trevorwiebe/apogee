@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
 import androidx.compose.material3.Card
@@ -38,6 +39,7 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.LineHeightStyle
 import com.trevorwiebe.apogee.R
 import com.trevorwiebe.apogee.global.presentation.ATextField
@@ -167,7 +169,10 @@ fun AddScheduleCouldDialog(
                             .padding(horizontal = 8.dp)
                             .fillMaxWidth(),
                         value = scheduleCouldTitle,
-                        placeHolder = "Title"
+                        placeHolder = "Title",
+                        keyboardOptions = KeyboardOptions(
+                            capitalization = KeyboardCapitalization.Words
+                        )
                     )
 
                     Spacer(Modifier.height(16.dp))
