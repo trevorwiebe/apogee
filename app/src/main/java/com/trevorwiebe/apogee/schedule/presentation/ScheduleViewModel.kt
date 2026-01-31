@@ -53,45 +53,6 @@ class ScheduleViewModel @Inject constructor(
         loadData()
     }
 
-    fun onEvent(event: ScheduleEvents){
-        when(event){
-            is ScheduleEvents.OnClick -> {
-                if(anySelected){
-                    updateTimeSlotSelection(event.timeSlot)
-                }
-                setAnySelected()
-            }
-            is ScheduleEvents.OnLongClick -> {
-                updateTimeSlotSelection(event.timeSlot)
-                setAnySelected()
-            }
-            is ScheduleEvents.OnSaveEvent -> {
-                try{
-                    val times = calculateStartAndEnd(timeSlots)
-                    val scheduleShould = ScheduleShould(
-                        id = 0,
-                        scheduleCouldId = event.scheduleCouldId,
-                        startTime = times.first,
-                        endTime = times.second,
-                        dayOfWeek = weekDaySelected,
-                    )
-
-                    viewModelScope.launch {
-                        saveScheduleShould(scheduleShould)
-                        timeSlots = timeSlots.map { it.copy(selected = false) }
-                        anySelected = false
-                    }
-
-                }catch (e: Exception){ }
-            }
-            is ScheduleEvents.OnSaveScheduleCould -> handleSaveScheduleCould(event)
-            is ScheduleEvents.OnDeselectAll -> {
-                timeSlots = timeSlots.map { it.copy(selected = false) }
-                anySelected = false
-            }
-        }
-    }
-
     private fun loadData(){
         viewModelScope.launch {
             combine(
@@ -105,6 +66,66 @@ class ScheduleViewModel @Inject constructor(
                 timeSlots = mappedSlots
             }
         }
+    }
+
+    fun onEvent(event: ScheduleEvents){
+        when(event){
+            is ScheduleEvents.OnClick -> handleClick(event)
+            is ScheduleEvents.OnLongClick -> handleLongClick(event)
+            is ScheduleEvents.OnSaveEvent -> handleSaveEvent(event)
+            is ScheduleEvents.OnSaveScheduleCould -> handleSaveScheduleCould(event)
+            is ScheduleEvents.OnDeselectAll -> handleDeselectAll()
+        }
+    }
+
+    private fun handleClick(event: ScheduleEvents.OnClick){
+        if(anySelected){
+            updateTimeSlotSelection(event.timeSlot)
+        }
+        setAnySelected()
+    }
+
+    private fun handleLongClick(event: ScheduleEvents.OnLongClick) {
+        updateTimeSlotSelection(event.timeSlot)
+        setAnySelected()
+    }
+
+    private fun handleSaveEvent(event: ScheduleEvents.OnSaveEvent){
+        try{
+            val times = calculateStartAndEnd(timeSlots)
+            val scheduleShould = ScheduleShould(
+                id = 0,
+                scheduleCouldId = event.scheduleCouldId,
+                startTime = times.first,
+                endTime = times.second,
+                dayOfWeek = weekDaySelected,
+            )
+
+            viewModelScope.launch {
+                saveScheduleShould(scheduleShould)
+                timeSlots = timeSlots.map { it.copy(selected = false) }
+                anySelected = false
+            }
+
+        }catch (e: Exception){ }
+    }
+
+    private fun handleSaveScheduleCould(event: ScheduleEvents.OnSaveScheduleCould){
+        val scheduleCould = ScheduleCould(
+            id = 0,
+            name = event.title,
+            description = event.description,
+            color = event.color
+        )
+        viewModelScope.launch {
+            saveScheduleCould(scheduleCould)
+            _snackbarEvent.send("Activity saved")
+        }
+    }
+
+    private fun handleDeselectAll(){
+        timeSlots = timeSlots.map { it.copy(selected = false) }
+        anySelected = false
     }
 
     private fun updateTimeSlotSelection(timeSlot: UiTimeSlot){
@@ -126,19 +147,6 @@ class ScheduleViewModel @Inject constructor(
 
     private fun setAnySelected(){
         anySelected = timeSlots.any { it.selected }
-    }
-
-    private fun handleSaveScheduleCould(event: ScheduleEvents.OnSaveScheduleCould){
-        val scheduleCould = ScheduleCould(
-            id = 0,
-            name = event.title,
-            description = event.description,
-            color = event.color
-        )
-        viewModelScope.launch {
-            saveScheduleCould(scheduleCould)
-            _snackbarEvent.send("Activity saved")
-        }
     }
 
     private fun calculateStartAndEnd(list: List<UiTimeSlot>): Pair<LocalTime, LocalTime> {
