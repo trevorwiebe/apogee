@@ -2,9 +2,13 @@ package com.trevorwiebe.apogee.schedule.presentation
 
 import com.trevorwiebe.apogee.global.domain.usecases.CreateWeekFifteenIncrements
 import com.trevorwiebe.apogee.schedule.data.ScheduleShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
+import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.SaveScheduleShould
 import com.trevorwiebe.apogee.testutils.MainDispatcherRule
+import com.trevorwiebe.apogee.testutils.TestDataFactory.createScheduleCould
+import com.trevorwiebe.apogee.testutils.TestDataFactory.createScheduleShould
 import io.mockk.coEvery
 import io.mockk.coVerify
 import io.mockk.every
@@ -34,23 +38,31 @@ class ScheduleViewModelTest {
 
     private val createWeekFifteenIncrements = CreateWeekFifteenIncrements()
     private lateinit var saveScheduleShould: SaveScheduleShould
+    private lateinit var saveScheduleCould: SaveScheduleCould
     private lateinit var getScheduledShould: GetScheduledShould
+    private lateinit var getScheduleCould: GetScheduleCould
     private lateinit var viewModel: ScheduleViewModel
 
     @Before
     fun setup() {
         saveScheduleShould = mockk()
+        saveScheduleCould = mockk()
         getScheduledShould = mockk()
+        getScheduleCould = mockk()
 
         every { getScheduledShould() } returns flowOf(emptyList())
+        every { getScheduleCould() } returns flowOf(emptyList())
         coEvery { saveScheduleShould(any()) } just Runs
+        coEvery { saveScheduleCould(any()) } just Runs
     }
 
     private fun createViewModel(): ScheduleViewModel {
         return ScheduleViewModel(
             createWeekFifteenIncrements,
             saveScheduleShould,
-            getScheduledShould
+            saveScheduleCould,
+            getScheduledShould,
+            getScheduleCould
         )
     }
 
@@ -104,14 +116,10 @@ class ScheduleViewModelTest {
     @Test
     fun `init loads scheduled items from getScheduledShould`() = runTest {
         // Given
-        val scheduledItem = ScheduleShould(
-            id = 1,
-            name = "Test Task",
-            startTime = LocalTime.of(9, 0),
-            endTime = LocalTime.of(9, 14, 59, 999_999_999),
-            dayOfWeek = 0
-        )
-        every { getScheduledShould() } returns flowOf(listOf(scheduledItem))
+        val scheduleCould = createScheduleCould(name = "Test Task")
+        val scheduleShould = createScheduleShould(dayOfWeek = 0)
+        every { getScheduleCould() } returns flowOf(listOf(scheduleCould))
+        every { getScheduledShould() } returns flowOf(listOf(scheduleShould))
 
         // When
         viewModel = createViewModel()
@@ -121,8 +129,8 @@ class ScheduleViewModelTest {
         val slotAt9AM = viewModel.timeSlots.find {
             it.slot.startTime == LocalTime.of(9, 0) && it.slot.dayOfTheWeek == 0
         }
-        assertNotNull(slotAt9AM?.task)
-        assertEquals("Test Task", slotAt9AM?.task?.name)
+        assertNotNull(slotAt9AM?.taskName)
+        assertEquals("Test Task", slotAt9AM?.taskName)
     }
 
     // endregion
@@ -309,32 +317,14 @@ class ScheduleViewModelTest {
         viewModel.onEvent(ScheduleEvents.OnClick(viewModel.timeSlots[1]))
 
         // When
-        viewModel.onEvent(ScheduleEvents.OnSaveEvent("My Task"))
+        viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
         // Then
         coVerify { saveScheduleShould(any()) }
-        assertEquals("My Task", capturedSchedule.captured.name)
+        assertEquals(100, capturedSchedule.captured.scheduleCouldId)
         assertEquals(LocalTime.of(0, 0), capturedSchedule.captured.startTime)
         assertEquals(LocalTime.of(0, 29, 59, 999_999_999), capturedSchedule.captured.endTime)
-    }
-
-    @Test
-    fun `OnSaveEvent uses Task as default title when empty`() = runTest {
-        // Given
-        viewModel = createViewModel()
-        val capturedSchedule = slot<ScheduleShould>()
-        coEvery { saveScheduleShould(capture(capturedSchedule)) } just Runs
-
-        viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
-
-        // When
-        viewModel.onEvent(ScheduleEvents.OnSaveEvent(""))
-        advanceUntilIdle()
-
-        // Then
-        coVerify { saveScheduleShould(any()) }
-        assertEquals("Task", capturedSchedule.captured.name)
     }
 
     @Test
@@ -347,7 +337,7 @@ class ScheduleViewModelTest {
         assertTrue(viewModel.timeSlots[1].selected)
 
         // When
-        viewModel.onEvent(ScheduleEvents.OnSaveEvent("Task"))
+        viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
         // Then
@@ -367,7 +357,7 @@ class ScheduleViewModelTest {
         viewModel.onEvent(ScheduleEvents.OnLongClick(viewModel.timeSlots[0]))
 
         // When
-        viewModel.onEvent(ScheduleEvents.OnSaveEvent("Task"))
+        viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
         // Then
@@ -384,7 +374,7 @@ class ScheduleViewModelTest {
         assertFalse(viewModel.saveButtonEnabled)
 
         // When
-        viewModel.onEvent(ScheduleEvents.OnSaveEvent("Task"))
+        viewModel.onEvent(ScheduleEvents.OnSaveEvent(100))
         advanceUntilIdle()
 
         // Then - save should not be called due to exception
@@ -398,16 +388,14 @@ class ScheduleViewModelTest {
     @Test
     fun `scheduled items are mapped to correct time slots`() = runTest {
         // Given
-        val scheduledItems = listOf(
-            ScheduleShould(
-                id = 1,
-                name = "Morning Meeting",
-                startTime = LocalTime.of(9, 0),
-                endTime = LocalTime.of(9, 59, 59, 999_999_999),
-                dayOfWeek = 0
-            )
+        val scheduleCould = createScheduleCould(name = "Morning Meeting")
+        val scheduleShould = createScheduleShould(
+            startTime = LocalTime.of(9, 0),
+            endTime = LocalTime.of(9, 59, 59, 999_999_999),
+            dayOfWeek = 0
         )
-        every { getScheduledShould() } returns flowOf(scheduledItems)
+        every { getScheduleCould() } returns flowOf(listOf(scheduleCould))
+        every { getScheduledShould() } returns flowOf(listOf(scheduleShould))
 
         // When
         viewModel = createViewModel()
@@ -421,30 +409,26 @@ class ScheduleViewModelTest {
         }
 
         assertTrue(slots9to10.isNotEmpty())
-        assertTrue(slots9to10.all { it.task?.name == "Morning Meeting" })
+        assertTrue(slots9to10.all { it.taskName == "Morning Meeting" })
     }
 
     @Test
-    fun `time slots without scheduled items have null task`() = runTest {
+    fun `time slots without scheduled items have null taskName`() = runTest {
         // Given
-        val scheduledItem = ScheduleShould(
-            id = 1,
-            name = "Meeting",
-            startTime = LocalTime.of(9, 0),
-            endTime = LocalTime.of(9, 14, 59, 999_999_999),
-            dayOfWeek = 0
-        )
-        every { getScheduledShould() } returns flowOf(listOf(scheduledItem))
+        val scheduleCould = createScheduleCould(name = "Meeting")
+        val scheduleShould = createScheduleShould(dayOfWeek = 0)
+        every { getScheduleCould() } returns flowOf(listOf(scheduleCould))
+        every { getScheduledShould() } returns flowOf(listOf(scheduleShould))
 
         // When
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        // Then - slots outside the scheduled time should have null task
+        // Then - slots outside the scheduled time should have null taskName
         val slot8AM = viewModel.timeSlots.find {
             it.slot.startTime == LocalTime.of(8, 0) && it.slot.dayOfTheWeek == 0
         }
-        assertNull(slot8AM?.task)
+        assertNull(slot8AM?.taskName)
     }
 
     // endregion
