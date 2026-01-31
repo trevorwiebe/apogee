@@ -64,13 +64,22 @@ fun AddScheduleCouldDialog(
     val scheduleCouldDescription = rememberSaveable { mutableStateOf("") }
     val color = rememberSaveable(saver = colorSaver) { mutableStateOf(primaryColor) }
 
+    fun resetState(){
+        scheduleCouldTitle.value = ""
+        scheduleCouldDescription.value = ""
+        color.value = primaryColor
+    }
+
     if (sheetOpen.value) {
         Dialog(
             properties = DialogProperties(
                 usePlatformDefaultWidth = false,
                 decorFitsSystemWindows = false
             ),
-            onDismissRequest = { sheetOpen.value = false },
+            onDismissRequest = {
+                sheetOpen.value = false
+                resetState()
+            },
         ) {
 
             SystemBarColorForFullScreenDialog()
@@ -95,7 +104,10 @@ fun AddScheduleCouldDialog(
                         verticalAlignment = Alignment.CenterVertically
                     ) {
                         IconButton(
-                            onClick = { sheetOpen.value = false }
+                            onClick = {
+                                sheetOpen.value = false
+                                resetState()
+                            }
                         ) {
                             Icon(
                                 painter = painterResource(R.drawable.close),
@@ -119,6 +131,7 @@ fun AddScheduleCouldDialog(
                                     scheduleCouldDescription.value,
                                     color.value
                                 )
+                                resetState()
                             },
                             enabled = scheduleCouldTitle.value.isNotEmpty()
                         ) {
