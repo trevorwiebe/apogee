@@ -90,8 +90,7 @@ class LogTimeViewModel @Inject constructor(
         return currentSlots.map { uiSlot ->
             val matchingTask = scheduleShouldList.find { task ->
                 task.dayOfWeek == uiSlot.slot.zeroDayOfWeek &&
-                task.startTime <= uiSlot.slot.startTime &&
-                task.endTime >= uiSlot.slot.endTime
+                task.startTime == uiSlot.slot.startTime
             }
             val scheduledName = matchingTask?.let { task ->
                 scheduleCouldList.find { it.id == task.scheduleCouldId }?.name

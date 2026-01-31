@@ -64,9 +64,8 @@ object ScheduleVMUtils {
     ): List<UiTimeSlot>{
         return timeList.map { time ->
             val task = taskList.find {
-                it.startTime <= time.slot.startTime &&
-                it.endTime >= time.slot.endTime &&
-                it.dayOfWeek == time.slot.dayOfTheWeek
+                it.dayOfWeek == time.slot.dayOfTheWeek &&
+                it.startTime == time.slot.startTime
             }
             val taskName = task?.let { t ->
                 scheduleCouldList.find { it.id == t.scheduleCouldId }

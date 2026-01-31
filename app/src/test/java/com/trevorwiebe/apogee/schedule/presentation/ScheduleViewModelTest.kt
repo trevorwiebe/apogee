@@ -340,7 +340,7 @@ class ScheduleViewModelTest {
         val scheduleCould = createScheduleCould(name = "Morning Meeting")
         val scheduleShould = createScheduleShould(
             startTime = LocalTime.of(9, 0),
-            endTime = LocalTime.of(9, 59, 59, 999_999_999),
+            endTime = LocalTime.of(9, 14, 59, 999_999_999),
             dayOfWeek = 0
         )
         every { getScheduleCould() } returns flowOf(listOf(scheduleCould))
@@ -350,15 +350,14 @@ class ScheduleViewModelTest {
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        // Then - slots from 9:00-10:00 should have the task
-        val slots9to10 = viewModel.timeSlots.filter {
+        // Then - the 9:00 slot should have the task
+        val slot9AM = viewModel.timeSlots.find {
             it.slot.dayOfTheWeek == 0 &&
-            it.slot.startTime >= LocalTime.of(9, 0) &&
-            it.slot.startTime < LocalTime.of(10, 0)
+            it.slot.startTime == LocalTime.of(9, 0)
         }
 
-        assertTrue(slots9to10.isNotEmpty())
-        assertTrue(slots9to10.all { it.taskName == "Morning Meeting" })
+        assertNotNull(slot9AM)
+        assertEquals("Morning Meeting", slot9AM?.taskName)
     }
 
     @Test

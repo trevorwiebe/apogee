@@ -125,7 +125,7 @@ class LogTimeViewModelTest {
         val scheduleCould = createScheduleCould(name = "Weekly Meeting")
         val scheduleShould = createScheduleShould(
             startTime = LocalTime.of(10, 0),
-            endTime = LocalTime.of(10, 29, 59, 999_999_999),
+            endTime = LocalTime.of(10, 14, 59, 999_999_999),
             dayOfWeek = 2 // Wednesday
         )
         every { getScheduledCould() } returns flowOf(listOf(scheduleCould))
@@ -135,11 +135,10 @@ class LogTimeViewModelTest {
         viewModel = createViewModel()
         advanceUntilIdle()
 
-        // Then
+        // Then - all Wednesday 10:00 slots across multiple weeks should match
         val wednesdaySlots = viewModel.slots.filter { it.slot.zeroDayOfWeek == 2 }
         val matchingSlots = wednesdaySlots.filter {
-            it.slot.startTime >= LocalTime.of(10, 0) &&
-            it.slot.startTime < LocalTime.of(10, 30)
+            it.slot.startTime == LocalTime.of(10, 0)
         }
 
         assertTrue(matchingSlots.isNotEmpty())
@@ -164,35 +163,6 @@ class LogTimeViewModelTest {
 
         assertNotNull(slot8AM)
         assertNull(slot8AM?.scheduledName)
-    }
-
-    @Test
-    fun `scheduled item spanning multiple slots maps to all covered slots`() = runTest {
-        // Given
-        val scheduleCould = createScheduleCould(name = "Long Meeting")
-        val scheduleShould = createScheduleShould(
-            startTime = LocalTime.of(14, 0),
-            endTime = LocalTime.of(14, 59, 59, 999_999_999),
-            dayOfWeek = 4 // Friday
-        )
-        every { getScheduledCould() } returns flowOf(listOf(scheduleCould))
-        every { getScheduledShould() } returns flowOf(listOf(scheduleShould))
-
-        // When
-        viewModel = createViewModel()
-        advanceUntilIdle()
-
-        // Then
-        val fridaySlots = viewModel.slots.filter { it.slot.zeroDayOfWeek == 4 }
-        val slots14to15 = fridaySlots.filter {
-            it.slot.startTime >= LocalTime.of(14, 0) &&
-            it.slot.startTime < LocalTime.of(15, 0)
-        }
-
-        // Each Friday has 4 slots between 14:00-15:00, across multiple Fridays
-        assertTrue(slots14to15.size >= 4)
-        assertTrue(slots14to15.size % 4 == 0) // Should be multiple of 4 (one set per Friday)
-        assertTrue(slots14to15.all { it.scheduledName == "Long Meeting" })
     }
 
     // endregion
@@ -288,7 +258,7 @@ class LogTimeViewModelTest {
         val scheduleCould = createScheduleCould(name = "Weekly Review")
         val scheduleShould = createScheduleShould(
             startTime = LocalTime.of(16, 0),
-            endTime = LocalTime.of(16, 59, 59, 999_999_999),
+            endTime = LocalTime.of(16, 14, 59, 999_999_999),
             dayOfWeek = 5 // Saturday
         )
         every { getScheduledCould() } returns flowOf(listOf(scheduleCould))
@@ -303,8 +273,7 @@ class LogTimeViewModelTest {
         // Then
         val saturdaySlots = viewModel.slots.filter { it.slot.zeroDayOfWeek == 5 }
         val matchingSlots = saturdaySlots.filter {
-            it.slot.startTime >= LocalTime.of(16, 0) &&
-            it.slot.startTime < LocalTime.of(17, 0)
+            it.slot.startTime == LocalTime.of(16, 0)
         }
 
         assertTrue(matchingSlots.all { it.scheduledName == "Weekly Review" })
