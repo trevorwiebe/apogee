@@ -45,7 +45,8 @@ class ScheduleViewModel @Inject constructor(
             UiTimeSlot(
                 slot = it,
                 selected = false,
-                taskName = null
+                scheduleCould = null,
+                lightColor = null
             )
         }
         loadData()

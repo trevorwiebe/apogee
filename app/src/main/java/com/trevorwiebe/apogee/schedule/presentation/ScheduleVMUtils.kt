@@ -67,10 +67,13 @@ object ScheduleVMUtils {
                 it.dayOfWeek == time.slot.dayOfTheWeek &&
                 it.startTime == time.slot.startTime
             }
-            val taskName = task?.let { t ->
+            val scheduleCould = task?.let { t ->
                 scheduleCouldList.find { it.id == t.scheduleCouldId }
-            }?.name
-            time.copy(taskName = taskName)
+            }
+            time.copy(
+                scheduleCould = scheduleCould,
+                lightColor = scheduleCould?.let { lightenColor(it.color) }
+            )
         }
     }
 }
