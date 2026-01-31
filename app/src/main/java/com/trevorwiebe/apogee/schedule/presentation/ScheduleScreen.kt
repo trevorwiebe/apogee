@@ -32,6 +32,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.trevorwiebe.apogee.R
@@ -40,6 +41,7 @@ import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleBottomShe
 import com.trevorwiebe.apogee.schedule.presentation.components.ScheduleDayList
 import com.trevorwiebe.apogee.schedule.presentation.components.Tabs
 import com.trevorwiebe.apogee.schedule.presentation.components.customSheetHeight
+import com.trevorwiebe.apogee.ui.Utils.displayCutoutPadding
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -158,11 +160,14 @@ fun ScheduleScreen(
                     }
                 )
             }
-        ) { padding ->
+        ) { _ ->
+
+            val displayCutout = displayCutoutPadding(LocalContext.current)
 
             Column(
                 modifier = Modifier
                     .padding(bottom = systemBarsBottom)
+                    .padding(displayCutout)
                     .fillMaxSize()
             ) {
                 Tabs(

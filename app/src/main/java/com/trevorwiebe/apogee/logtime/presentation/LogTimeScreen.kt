@@ -1,5 +1,6 @@
 package com.trevorwiebe.apogee.logtime.presentation
 
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.FilledTonalIconButton
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.IconButtonDefaults
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
@@ -24,7 +26,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import com.trevorwiebe.apogee.R
 import com.trevorwiebe.apogee.logtime.presentation.components.DateHeader
 import com.trevorwiebe.apogee.logtime.presentation.components.LogTimeSlotItem
@@ -92,6 +94,19 @@ fun LogTimeScreen(
                 targetValue = if (state.showScrollToNowButton) 0.dp else 64.dp,
                 label = "scrollToNowButtonOffset"
             )
+            val tonalIconColor by animateColorAsState(
+                targetValue = if(state.showScrollToNowButton)
+                    MaterialTheme.colorScheme.onSecondaryContainer
+                else MaterialTheme.colorScheme.surface,
+                label = "scrollToNowButtonColor"
+            )
+            val tonalButtonColor by animateColorAsState(
+                targetValue = if(state.showScrollToNowButton)
+                    MaterialTheme.colorScheme.secondaryContainer
+                else MaterialTheme.colorScheme.surface,
+                label = "scrollToNowButtonColor"
+            )
+
             Row(
                 modifier = Modifier.offset(x = buttonOffset),
                 verticalAlignment = Alignment.CenterVertically,
@@ -110,12 +125,15 @@ fun LogTimeScreen(
                     onClick = { viewModel.onEvent(LogTimeEvents.OnScrollToNowClicked) },
                     modifier = Modifier
                         .padding(horizontal = 8.dp)
-                        .size(48.dp)
+                        .size(48.dp),
+                    colors = IconButtonDefaults.filledTonalIconButtonColors(
+                        containerColor = tonalButtonColor
+                    )
                 ) {
                     Icon(
                         painter = painterResource(R.drawable.calendar_today),
                         contentDescription = null,
-                        tint = MaterialTheme.colorScheme.onBackground
+                        tint = tonalIconColor
                     )
                 }
             }
