@@ -109,7 +109,8 @@ fun ScheduleBottomSheet(
                     Text(
                         modifier = Modifier.weight(1f),
                         text = scheduleCould.name,
-                        fontWeight = FontWeight.Medium
+                        fontWeight = FontWeight.Medium,
+                        color = scheduleCould.color
                     )
                 }
             }

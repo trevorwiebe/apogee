@@ -1,5 +1,6 @@
 package com.trevorwiebe.apogee.global.presentation
 
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.OutlinedTextField
 import androidx.compose.material3.Text
@@ -12,7 +13,8 @@ fun ATextField(
     modifier: Modifier = Modifier,
     value: MutableState<String>,
     placeHolder: String? = null,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default
+    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardActions: KeyboardActions = KeyboardActions.Default
 ) {
 
     OutlinedTextField(
@@ -26,6 +28,8 @@ fun ATextField(
                 Text(text = placeHolder)
             }
         },
-        keyboardOptions = keyboardOptions
+        keyboardOptions = keyboardOptions,
+        keyboardActions = keyboardActions,
+        maxLines = 1
     )
 }

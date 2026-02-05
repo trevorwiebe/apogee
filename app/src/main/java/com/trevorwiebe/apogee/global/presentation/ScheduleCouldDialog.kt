@@ -15,6 +15,7 @@ import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.foundation.layout.systemBars
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Button
@@ -26,6 +27,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.Saver
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Alignment
@@ -34,6 +36,10 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.style.LineHeightStyle
 import androidx.compose.ui.text.style.TextOverflow
@@ -55,6 +61,8 @@ fun ScheduleCouldDialog(
     val isEditMode = scheduleCould != null
     val primaryColor = MaterialTheme.colorScheme.primary
     val scrollState = rememberScrollState()
+    val focusManager = LocalFocusManager.current
+    val descriptionFocusRequester = remember { FocusRequester() }
 
     val colorSaver = Saver<MutableState<Color>, Long>(
         save = { it.value.value.toLong() },
@@ -170,7 +178,11 @@ fun ScheduleCouldDialog(
                         value = scheduleCouldTitle,
                         placeHolder = "Title",
                         keyboardOptions = KeyboardOptions(
-                            capitalization = KeyboardCapitalization.Words
+                            capitalization = KeyboardCapitalization.Words,
+                            imeAction = ImeAction.Next
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onNext = { descriptionFocusRequester.requestFocus() }
                         )
                     )
 
@@ -179,9 +191,16 @@ fun ScheduleCouldDialog(
                     ATextField(
                         modifier = Modifier
                             .padding(horizontal = 8.dp)
-                            .fillMaxWidth(),
+                            .fillMaxWidth()
+                            .focusRequester(descriptionFocusRequester),
                         value = scheduleCouldDescription,
-                        placeHolder = "Description (optional)"
+                        placeHolder = "Description (optional)",
+                        keyboardOptions = KeyboardOptions(
+                            imeAction = ImeAction.Done
+                        ),
+                        keyboardActions = KeyboardActions(
+                            onDone = { focusManager.clearFocus() }
+                        )
                     )
 
                     Spacer(Modifier.height(8.dp))

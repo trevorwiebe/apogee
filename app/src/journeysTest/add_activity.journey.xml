@@ -2,8 +2,9 @@
 <journey name="Add Activity">
     <description xml:space="preserve">Testing to see if adding activities works as expected</description>
     <actions xml:space="preserve">
-        <action>Click on the edit schedule button in the top right corner. You will then be on another screen that looks very similar, but this one has day of the week tabs.</action>
+        <action>Click on the edit schedule button in the top right corner.</action>
+        <action>Verify that you are on the "Schedule" screen.</action>
         <action>Now tap the button in the top right corner.</action>
-        <action>Add a title of Sleeping, and a description of "Sleep that knits up the ravelled sleeve of care" . Do not press enter.  Then choose a green color. Then hit save.</action><action>Then make sure you are on the Monday tab, then press and hold the 00:00 - 00:15 item, and then tap on a couple more.</action><action>Then select Sleeping from the bottom sheet. Then confirm that Sleeping is set as the task on the items you selected in the Monday tab</action>
+        <action>Add a title of Sleeping, and a description of "Sleep that knits up the ravelled sleave of care". Then choose a green color. Then hit save.</action><action>Then make sure you are on the Monday tab, then press and hold the 00:00 - 00:15 item, and then tap on a couple more.</action><action>Then select Sleeping from the bottom sheet. Then confirm that Sleeping is set as the task on the items you selected in the Monday tab</action>
     </actions>
 </journey>
