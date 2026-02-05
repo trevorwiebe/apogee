@@ -5,6 +5,7 @@ plugins {
     alias(libs.plugins.android.application)
     alias(libs.plugins.kotlin.compose)
     alias(libs.plugins.google.gms.google.services)
+    alias(libs.plugins.firebase.appdistribution)
     alias(libs.plugins.ksp)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.android)
@@ -38,6 +39,12 @@ configure<ApplicationExtension> {
                 "proguard-rules.pro"
             )
             signingConfig = signingConfigs.getByName("release")
+            
+            firebaseAppDistribution {
+                artifactType = "APK"
+                testers = System.getenv("FIREBASE_TESTERS") ?: ""
+                releaseNotes = System.getenv("FIREBASE_RELEASE_NOTES") ?: "New test build"
+            }
         }
     }
     compileOptions {

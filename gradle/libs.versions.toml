@@ -10,6 +10,7 @@ activityCompose = "1.12.2"
 kotlin = "2.3.0"
 composeBom = "2025.12.01"
 googleGmsGoogleServices = "4.4.4"
+firebaseAppDistribution = "5.1.1"
 firebaseFirestore = "26.0.2"
 ksp = "2.3.4"
 hilt = "2.57.2"
@@ -54,6 +55,7 @@ journeys-junit-engine = { group = "com.android.tools.journeys", name = "journeys
 android-application = { id = "com.android.application", version.ref = "agp" }
 kotlin-compose = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
 google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
+firebase-appdistribution = { id = "com.google.firebase.appdistribution", version.ref = "firebaseAppDistribution" }
 ksp = { id = "com.google.devtools.ksp", version.ref = "ksp" }
 hilt = { id = "com.google.dagger.hilt.android", version.ref = "hilt" }
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }
