@@ -41,6 +41,8 @@ fun LogTimeSlotItem(uiSlot: LogTimeUiSlot) {
         if (uiSlot.scheduledName == null) {
             Spacer(modifier = Modifier.height(16.dp))
         } else {
+            val defaultBackground = MaterialTheme.colorScheme.surfaceVariant
+            val defaultTextColor = MaterialTheme.colorScheme.onSurfaceVariant
             Row(
                 modifier = Modifier
                     .fillMaxWidth(0.5f)
@@ -50,13 +52,13 @@ fun LogTimeSlotItem(uiSlot: LogTimeUiSlot) {
                 Text(
                     modifier = Modifier
                         .clip(CircleShape)
-                        .background(MaterialTheme.colorScheme.surfaceVariant)
+                        .background(uiSlot.lightColor ?: defaultBackground)
                         .padding(horizontal = 16.dp, vertical = 4.dp)
                         .fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     text = uiSlot.scheduledName,
                     fontSize = 14.sp,
-                    color = MaterialTheme.colorScheme.onSurfaceVariant,
+                    color = uiSlot.color ?: defaultTextColor,
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )

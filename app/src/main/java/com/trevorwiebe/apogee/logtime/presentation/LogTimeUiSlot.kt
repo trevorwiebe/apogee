@@ -1,9 +1,11 @@
 package com.trevorwiebe.apogee.logtime.presentation
 
+import androidx.compose.ui.graphics.Color
 import com.trevorwiebe.apogee.logtime.domain.DateTimeSlot
-import com.trevorwiebe.apogee.schedule.data.ScheduleShould
 
 data class LogTimeUiSlot(
     val slot: DateTimeSlot,
-    val scheduledName: String? = null
+    val scheduledName: String? = null,
+    val color: Color? = null,
+    val lightColor: Color? = null
 )

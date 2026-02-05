@@ -9,6 +9,7 @@ import com.trevorwiebe.apogee.logtime.domain.usecases.CreateDateTimeSlots
 import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
+import com.trevorwiebe.apogee.schedule.presentation.ScheduleVMUtils.lightenColor
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.combine
@@ -92,10 +93,14 @@ class LogTimeViewModel @Inject constructor(
                 task.dayOfWeek == uiSlot.slot.zeroDayOfWeek &&
                 task.startTime == uiSlot.slot.startTime
             }
-            val scheduledName = matchingTask?.let { task ->
-                scheduleCouldList.find { it.id == task.scheduleCouldId }?.name
+            val scheduleCould = matchingTask?.let { task ->
+                scheduleCouldList.find { it.id == task.scheduleCouldId }
             }
-            uiSlot.copy(scheduledName = scheduledName)
+            uiSlot.copy(
+                scheduledName = scheduleCould?.name,
+                color = scheduleCould?.color,
+                lightColor = scheduleCould?.let { lightenColor(it.color) }
+            )
         }
     }
 
