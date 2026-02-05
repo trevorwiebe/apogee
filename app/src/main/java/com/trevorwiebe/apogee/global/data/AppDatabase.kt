@@ -15,7 +15,7 @@ import com.trevorwiebe.apogee.schedule.data.ScheduleShouldDao
     version = 1,
     exportSchema = true
 )
-@TypeConverters(LocalTimeConverter::class, ColorConverter::class)
+@TypeConverters(LocalTimeConverter::class, LocalDateTimeConverter::class, ColorConverter::class)
 abstract class AppDatabase : RoomDatabase() {
 
     abstract fun scheduleItemDao(): ScheduleShouldDao

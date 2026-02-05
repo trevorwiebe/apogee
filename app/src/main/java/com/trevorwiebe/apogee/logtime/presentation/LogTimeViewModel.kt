@@ -5,7 +5,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.trevorwiebe.apogee.logtime.data.Did
 import com.trevorwiebe.apogee.logtime.domain.usecases.CreateDateTimeSlots
+import com.trevorwiebe.apogee.logtime.domain.usecases.GetDid
+import com.trevorwiebe.apogee.logtime.domain.usecases.SaveDid
 import com.trevorwiebe.apogee.schedule.data.ScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduleCould
 import com.trevorwiebe.apogee.schedule.domain.usecases.GetScheduledShould
@@ -24,7 +27,9 @@ import javax.inject.Inject
 class LogTimeViewModel @Inject constructor(
     private val createDateTimeSlots: CreateDateTimeSlots,
     private val getScheduledShould: GetScheduledShould,
-    private val getScheduleCould: GetScheduleCould
+    private val getScheduleCould: GetScheduleCould,
+    private val getDid: GetDid,
+    private val saveDid: SaveDid
 ) : ViewModel() {
 
     companion object {
@@ -39,11 +44,14 @@ class LogTimeViewModel @Inject constructor(
     var slots by mutableStateOf<List<LogTimeUiSlot>>(emptyList())
         private set
 
+    var scheduleCouldList by mutableStateOf<List<ScheduleCould>>(emptyList())
+        private set
+
     private val _scrollToNowEvent = Channel<Int>()
     val scrollToNowEvent = _scrollToNowEvent.receiveAsFlow()
 
     private var scheduleShouldList: List<com.trevorwiebe.apogee.schedule.data.ScheduleShould> = emptyList()
-    private var scheduleCouldList: List<ScheduleCould> = emptyList()
+    private var didList: List<Did> = emptyList()
 
     private var loadedStartDate: LocalDate = LocalDate.now()
     private var loadedEndDate: LocalDate = LocalDate.now()
@@ -76,19 +84,22 @@ class LogTimeViewModel @Inject constructor(
         viewModelScope.launch {
             combine(
                 getScheduledShould(),
-                getScheduleCould()
-            ) { shouldList, couldList ->
+                getScheduleCould(),
+                getDid()
+            ) { shouldList, couldList, didEntries ->
                 scheduleShouldList = shouldList
                 scheduleCouldList = couldList
-                mapScheduleShouldToSlots(slots)
+                didList = didEntries
+                mapSchedulesToSlots(slots)
             }.collect { updatedSlots ->
                 slots = updatedSlots
             }
         }
     }
 
-    private fun mapScheduleShouldToSlots(currentSlots: List<LogTimeUiSlot>): List<LogTimeUiSlot> {
+    private fun mapSchedulesToSlots(currentSlots: List<LogTimeUiSlot>): List<LogTimeUiSlot> {
         return currentSlots.map { uiSlot ->
+            // Map scheduled (should) activity
             val matchingTask = scheduleShouldList.find { task ->
                 task.dayOfWeek == uiSlot.slot.zeroDayOfWeek &&
                 task.startTime == uiSlot.slot.startTime
@@ -96,10 +107,22 @@ class LogTimeViewModel @Inject constructor(
             val scheduleCould = matchingTask?.let { task ->
                 scheduleCouldList.find { it.id == task.scheduleCouldId }
             }
+
+            // Map actual (did) activity
+            val matchingDid = didList.find { did ->
+                did.startDateTime == uiSlot.slot.startDateTime
+            }
+            val actualCould = matchingDid?.let { did ->
+                scheduleCouldList.find { it.id == did.scheduleCouldId }
+            }
+
             uiSlot.copy(
                 scheduledName = scheduleCould?.name,
                 color = scheduleCould?.color,
-                lightColor = scheduleCould?.let { lightenColor(it.color) }
+                lightColor = scheduleCould?.let { lightenColor(it.color) },
+                actualName = actualCould?.name,
+                actualColor = actualCould?.color,
+                actualLightColor = actualCould?.let { lightenColor(it.color) }
             )
         }
     }
@@ -123,6 +146,48 @@ class LogTimeViewModel @Inject constructor(
                     _scrollToNowEvent.send(state.initialScrollIndex)
                 }
             }
+            is LogTimeEvents.OnClick -> {
+                toggleSelection(event.slot)
+            }
+            is LogTimeEvents.OnSaveActual -> {
+                saveActualForSelected(event.scheduleCouldId)
+            }
+            is LogTimeEvents.OnDeselectAll -> {
+                deselectAll()
+            }
+        }
+    }
+
+    private fun toggleSelection(slot: LogTimeUiSlot) {
+        slots = slots.map {
+            if (it.slot.startDateTime == slot.slot.startDateTime) {
+                it.copy(selected = !it.selected)
+            } else it
+        }
+        updateAnySelected()
+    }
+
+    private fun deselectAll() {
+        slots = slots.map { it.copy(selected = false) }
+        state = state.copy(anySelected = false)
+    }
+
+    private fun updateAnySelected() {
+        val anySelected = slots.any { it.selected }
+        state = state.copy(anySelected = anySelected)
+    }
+
+    private fun saveActualForSelected(scheduleCouldId: Int) {
+        viewModelScope.launch {
+            val selectedSlots = slots.filter { it.selected }
+            selectedSlots.forEach { slot ->
+                val did = Did(
+                    scheduleCouldId = scheduleCouldId,
+                    startDateTime = slot.slot.startDateTime
+                )
+                saveDid(did)
+            }
+            deselectAll()
         }
     }
 
@@ -132,7 +197,7 @@ class LogTimeViewModel @Inject constructor(
             .map { LogTimeUiSlot(slot = it) }
 
         loadedStartDate = newStartDate
-        slots = mapScheduleShouldToSlots(newSlots) + slots
+        slots = mapSchedulesToSlots(newSlots) + slots
     }
 
     private fun loadLaterDates() {
@@ -141,6 +206,6 @@ class LogTimeViewModel @Inject constructor(
             .map { LogTimeUiSlot(slot = it) }
 
         loadedEndDate = newEndDate
-        slots = slots + mapScheduleShouldToSlots(newSlots)
+        slots = slots + mapSchedulesToSlots(newSlots)
     }
 }

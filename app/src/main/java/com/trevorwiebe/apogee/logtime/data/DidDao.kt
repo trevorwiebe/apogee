@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface DidDao {
 
-    @Insert(onConflict = OnConflictStrategy.Companion.REPLACE)
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insert(did: Did)
 
     @Update
@@ -23,9 +23,15 @@ interface DidDao {
     @Query("SELECT * FROM schedule_did WHERE id = :id")
     suspend fun getById(id: Int): Did?
 
-    @Query("SELECT * FROM schedule_did ORDER BY name ASC")
+    @Query("SELECT * FROM schedule_did WHERE startDateTime = :startDateTime")
+    suspend fun getByStartDateTime(startDateTime: String): Did?
+
+    @Query("SELECT * FROM schedule_did ORDER BY startDateTime ASC")
     fun getAllFlow(): Flow<List<Did>>
 
     @Query("DELETE FROM schedule_did WHERE id = :id")
     suspend fun deleteById(id: Int)
+
+    @Query("DELETE FROM schedule_did WHERE startDateTime = :startDateTime")
+    suspend fun deleteByStartDateTime(startDateTime: String)
 }
